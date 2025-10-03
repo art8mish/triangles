@@ -17,4 +17,9 @@ namespace triangles
             return 1e-6f;
     }
 
+    template <std::floating_point T>
+    bool is_valid(T num) {
+        return std::isfinite(num) && !std::isnan(num);
+    }
+
 }

@@ -1,3 +1,4 @@
+#pragma once
 
 #include <string>
 #include <concepts>
@@ -20,14 +21,24 @@ namespace triangles
         Point(const T &x, const T &y, const T &z) :
             x_{x}, y_{y}, z_{z} {}
 
-    
+
         bool valid() const {
-            return std::isnormal(x_) 
-                && std::isnormal(y_) 
-                && std::isnormal(z_);
+            return is_valid(x_)
+                && is_valid(y_) 
+                && is_valid(z_);
+        }
+
+        bool is_null() const {
+            if (!valid())
+                return false;
+            return std::abs(x_ - 0.0L) < eps_
+                && std::abs(y_ - 0.0L) < eps_
+                && std::abs(z_ - 0.0L) < eps_;
         }
 
         bool operator == (const Point<T>& other) const {
+            if (!valid() || !other.valid())
+                return false;
             return std::abs(x_ - other.x_) < eps_ 
                 && std::abs(y_ - other.y_) < eps_ 
                 && std::abs(z_ - other.z_) < eps_;
@@ -42,7 +53,7 @@ namespace triangles
     };
 
 
-    template<std::floating_point T>
+    template<std::floating_point T = double>
     class Vector {
     public:
         T dx_ = std::numeric_limits<T>::quiet_NaN();
@@ -68,9 +79,9 @@ namespace triangles
         
         // think about vec(0)
         bool valid() const {
-            return std::isnormal(dx_) 
-                && std::isnormal(dy_) 
-                && std::isnormal(dz_);
+            return is_valid(dx_) 
+                && is_valid(dy_) 
+                && is_valid(dz_);
         }
 
         bool operator == (const Vector<T>& other) const {

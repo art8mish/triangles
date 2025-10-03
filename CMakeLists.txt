@@ -11,8 +11,11 @@ set(SRC ${SRC_DIR}/triangles.cpp)
 
 set(TESTS_DIR tests)
 
-set(TESTS_TARGET triangles_tests)
-set(TESTS_SRC ${TESTS_DIR}/triangles_tests.cpp)
+set(TEST_POINT point_tests)
+set(TEST_POINT_SRC ${TESTS_DIR}/point_tests.cpp)
+
+set(TEST_VECTOR vector_tests)
+set(TEST_VECTOR_SRC ${TESTS_DIR}/vector_tests.cpp)
 
 add_compile_options(
     -D DEBUG
@@ -41,5 +44,8 @@ add_compile_options(
 include_directories(${INCLUDE_DIR})
 add_executable(${TARGET} ${SRC})
 
-add_executable(${TESTS_TARGET} ${TESTS_SRC})
-target_link_libraries(${TESTS_TARGET} gtest gmock pthread)
+add_executable(${TEST_POINT} ${TEST_POINT_SRC})
+target_link_libraries(${TEST_POINT} gtest gmock pthread)
+
+add_executable(${TEST_VECTOR} ${TEST_VECTOR_SRC})
+target_link_libraries(${TEST_VECTOR} gtest gmock pthread)

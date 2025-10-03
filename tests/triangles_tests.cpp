@@ -2,7 +2,6 @@
 #include <gtest/gtest.h>
 #include <fstream>
 
-
 class TestTriangles : public ::testing::Test
 {
 protected:
@@ -16,9 +15,6 @@ protected:
 };
 
 TEST_F(TestTriangles, Functions) {
-}
-
-TEST(TrianglesTests, Data) {
 }
 
 int main(int argc, char *argv[])

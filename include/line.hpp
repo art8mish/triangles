@@ -1,3 +1,4 @@
+#pragma once
 
 #include <string>
 #include <concepts>
@@ -22,11 +23,8 @@ namespace triangles {
             p_ {x1, y1, z1}, d_ {x1, y1, z1, x2, y2, z2} {}
 
         bool valid() const {
-
-
-            return std::isnormal(x_) 
-                && std::isnormal(y_) 
-                && std::isnormal(z_);
+            return  p_.valid() 
+                 && d_.valid() && !d_.is_null();
         }
 
         bool operator == (const Line<T>& other) const {
