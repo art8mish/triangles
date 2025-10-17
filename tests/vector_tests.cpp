@@ -4,6 +4,7 @@
 #include <fstream>
 
 #include <../include/point.hpp>
+#include <../include/vector.hpp>
 
 class TestVector : public ::testing::Test
 {
