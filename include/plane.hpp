@@ -1,76 +1,92 @@
 #pragma once
 
-#include <string>
-#include <concepts>
 #include <cmath>
+#include <concepts>
 #include <stdexcept>
+#include <string>
 
-#include <vector.hpp>
+#include <point.hpp>
 #include <utils.hpp>
+#include <vector.hpp>
+
 namespace triangles {
-    template<std::floating_point T>
-    class Plane {
-        // L: p_ + vec(d_) * t
-        
-        Point p_ {};
-        Vector n_ {};
-        
-        bool validity_ {false};
-        void validate() {
-            if (p_.valid() && n_.valid() && !n_.is_null())
-                validity_ = true;
-        }
+template <std::floating_point T> class Plane {
+    // L: (n_, r - p_) = 0
 
-        void check_validity() {
-            if (!valid())
-                throw std::logic_error(to_string()+" is not valid");
-        }
+    Point<T> p_{};
+    Vector<T> n_{};
 
-    public:
-        Plane() = default;
-        Plane(const Point<T> &p, const Vector<T> &n) : 
-            p_ {p}, n_ {n} {validate();}
+    bool validity_{false};
+    void validate() {
+        if (p_.valid() && n_.valid() && !n_.is_null())
+            validity_ = true;
+    }
 
-        Plane(const Point<T> &p1, const Point<T> &p2, const Point<T> &p3) :
-            p_ {p1}, n_{Vector{p1, p2}.ecross(Vector{p1, p3})} {validate();}
+    void check_validity() {
+        if (!valid())
+            throw std::logic_error(to_string() + " is not valid");
+    }
 
-        bool valid() const {
-            return validity_;
-        }
+public:
+    Plane() = default;
+    Plane(const Point<T> &p, const Vector<T> &n) : p_{p}, n_{n} {
+        validate();
+    }
 
-        bool operator== (const Plane<T>& rhs) const {
-            check_validity();
-            rhs.check_validity();
+    Plane(const Point<T> &p1, const Point<T> &p2, const Point<T> &p3)
+        : p_{p1}, n_{Vector<T>{p1, p2}.ecross(Vector<T>{p1, p3})} {
+        validate();
+    }
 
-            return contains(rhs.p_) && parallel_to(rhs);
-        }
+    bool valid() const {
+        return validity_;
+    }
 
-        bool operator!= (const Line<T>& rhs) const {
-            return !(*this == rhs)
-        }
+    const Vector<T> &normal() return n_;
 
-        bool contains (const Point<T>& point) const {
-            check_validity();
-            point.check_validity();
+    bool operator==(const Plane<T> &rhs) const {
+        check_validity();
+        rhs.check_validity();
 
-            if (p_ == point)
-                return true;
+        return contains(rhs.p_) && parallel_to(rhs);
+    }
 
-            Vector point_vec {p_, point};
-            return n_.orthogonal_to(point_vec);
-        }
-        
-        bool parallel_to (const Line<T>& rhs) const {
-            check_validity();
-            rhs.check_validity();
-            
-            return n_.collinear_with(rhs.n_)
-        }
+    bool operator!=(const Plane<T> &rhs) const {
+        return !(*this == rhs)
+    }
 
-        std::string to_string() const {
-            return "Plane((" 
-            + n_.to_string() + ", (x, y, z) -" 
-            + p_.to_string() + ") = 0";
-        }
-    };
-}
+    bool contains(const Point<T> &point) const {
+        check_validity();
+        point.check_validity();
+
+        if (p_ == point)
+            return true;
+        return n_.orthogonal_to(Vector<T>{p_, point});
+    }
+
+    T signed_distance(const Point<T> &point) const {
+        check_validity();
+        point.check_validity();
+
+        return n_.edot(Vector{plane.p_, point});
+    }
+
+    // L: (n_, r) + D = 0
+    T D() const {
+        check_validity();
+        return -n_.edot(p_);
+    }
+
+    bool parallel_to(const Plane<T> &rhs) const {
+        check_validity();
+        rhs.check_validity();
+
+        return n_.collinear_with(rhs.n_)
+    }
+
+    std::string to_string() const {
+        return "Plane((" + n_.to_string() + ", (x, y, z) -" +
+               p_.to_string() + ") = 0";
+    }
+};
+} // namespace triangles
