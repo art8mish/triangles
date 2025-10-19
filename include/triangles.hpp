@@ -22,8 +22,6 @@ template <std::floating_point T> class Triangle {
     Point<T> p3_{};
     T eps_{get_epsilon<T>()};
 
-    Kind kind_{Kind::INVALID};
-
     enum class Kind {
         NORMAL,
         LINE,   // one point is lying between two anrhs (or
@@ -32,8 +30,10 @@ template <std::floating_point T> class Triangle {
         INVALID // point is invalid
     };
 
+    Kind kind_{Kind::INVALID};
+
     void validate() const {
-        if (!p1_.valid() || !p2_.valid() || !p3_.valid()) {
+        if (!p1_.is_valid() || !p2_.is_valid() || !p3_.is_valid()) {
             kind_ = Kind::INVALID;
             return;
         }
@@ -47,12 +47,39 @@ template <std::floating_point T> class Triangle {
             kind_ = Kind::NORMAL;
     }
 
-    void check_validity() {
-        if (!valid())
+    void check_validity() const {
+        if (!is_valid())
             throw std::logic_error(to_string() + " is not valid");
     }
 
-    // rule: lhs and rhs lie on plane
+    // rule: lhs and rhs should be in 2d and lie on same plane
+    bool normal_projection_intersection_2d_(const Triangle<T> &rhs) const {
+        std::array<Vector<T>, 3> lhs_normals {
+            Vector<T> {-(p2_.y_ - p1_.y_),p2_.x_ - p1_.x_},
+            Vector<T> {-(p3_.y_ - p1_.y_), p3_.x_ - p1_.x_},
+            Vector<T> {-(p3_.y_ - p2_.y_), p3_.x_ - p2_.x_}
+        };
+
+        for (const Vector<T> &n : lhs_normals) {
+            T lhs_proj1 = n.edot(Vector<T> {p1_});
+            T lhs_proj2 = n.edot(Vector<T> {p2_});
+            T lhs_proj3 = n.edot(Vector<T> {p3_});
+            T lhs_min = std::min({lhs_proj1, lhs_proj2, lhs_proj3});
+            T lhs_max = std::max({lhs_proj1, lhs_proj2, lhs_proj3});
+
+            T rhs_proj1 = n.edot(Vector<T> {rhs.p1_});
+            T rhs_proj2 = n.edot(Vector<T> {rhs.p2_});
+            T rhs_proj3 = n.edot(Vector<T> {rhs.p3_});
+            T rhs_min = std::min({rhs_proj1, rhs_proj2, rhs_proj3});
+            T rhs_max = std::max({rhs_proj1, rhs_proj2, rhs_proj3});
+
+            if (lhs_max < rhs_min || rhs_max < lhs_min) 
+                return false;
+        }
+        return true;
+    }
+
+    // rule: lhs and rhs lie on same plane
     bool intersects_2d_(const Triangle<T> &rhs) const {
         const Plane<T> &plane = get_plane();
         assert(plane == rhs.get_plane());
@@ -62,102 +89,16 @@ template <std::floating_point T> class Triangle {
         Vector<T> u = plane_n.get_perpendicular();
         Vector<T> v = plane_n.ecross(u);
 
-        Triangle<T> lhs = to_2d(u, v, plane_p);
-        Triangle<T> rhs = rhs.to_2d(u, v, plane_p);
+        Triangle<T> lhs_2d = to_2d(u, v, plane_p);
+        assert(lhs_2d.is_valid());
 
-        std::array<Vector<T>, 3> lhs_normals {
-            Vector<T> {
-                -(lhs.p2_.y_ - lhs.p1_.y_),
-                lhs.p2_.x_ - lhs.p1_.x_
-            },
-            Vector<T> {
-                -(lhs.p3_.y_ - lhs.p1_.y_),
-                lhs.p3_.x_ - lhs.p1_.x_
-            },
-            Vector<T> {
-                -(lhs.p3_.y_ - lhs.p2_.y_),
-                lhs.p3_.x_ - lhs.p2_.x_
-            }
-        };
+        Triangle<T> rhs_2d = rhs.to_2d(u, v, plane_p);
+        assert(rhs_2d.is_valid());
 
-        for (const Vector<T> &n : lhs_normals) {
-            T lhs_proj1 = n.edot(Vector<T> {lhs.p1_});
-            T lhs_proj2 = n.edot(Vector<T> {lhs.p2_});
-            T lhs_proj3 = n.edot(Vector<T> {lhs.p3_});
-            T lhs_min = std::min({lhs_proj1, lhs_proj2, lhs_proj3});
-            T lhs_max = std::max({lhs_proj1, lhs_proj2, lhs_proj3});
-
-            T rhs_proj1 = n.edot(Vector<T> {lhs.p1_});
-            T rhs_proj2 = n.edot(Vector<T> {lhs.p2_});
-            T rhs_proj3 = n.edot(Vector<T> {lhs.p3_});
-            T rhs_min = std::min({rhs_proj1, rhs_proj2, rhs_proj3});
-            T rhs_max = std::max({rhs_proj1, rhs_proj2, rhs_proj3});
-
-            if (lhs_max < rhs_min || rhs_max < lhs_min) 
-                return false;
-        }
-
-        // std::array<Vector<T>, 3> rhs_normals {
-        //     Vector<T> {
-        //         -(lhs.p2_.y_ - lhs.p1_.y_),
-        //         lhs.p2_.x_ - lhs.p1_.x_
-        //     },
-        //     Vector<T> {
-        //         -(lhs.p3_.y_ - lhs.p1_.y_),
-        //         lhs.p3_.x_ - lhs.p1_.x_
-        //     },
-        //     Vector<T> {
-        //         -(lhs.p3_.y_ - lhs.p2_.y_),
-        //         lhs.p3_.x_ - lhs.p2_.x_
-        //     }
-        // };
-
-        // for (const Vector<T> &n : normals) {
-        //     T lhs_proj1 = n.edot(Vector<T> {lhs.p1_});
-        //     T lhs_proj2 = n.edot(Vector<T> {lhs.p2_});
-        //     T lhs_proj3 = n.edot(Vector<T> {lhs.p3_});
-        //     T lhs_min = std::min({lhs_proj1, lhs_proj2, lhs_proj3});
-        //     T lhs_max = std::max({lhs_proj1, lhs_proj2, lhs_proj3});
-
-        //     T rhs_proj1 = n.edot(Vector<T> {lhs.p1_});
-        //     T rhs_proj2 = n.edot(Vector<T> {lhs.p2_});
-        //     T rhs_proj3 = n.edot(Vector<T> {lhs.p3_});
-        //     T rhs_min = std::min({rhs_proj1, rhs_proj2, rhs_proj3});
-        //     T rhs_max = std::max({rhs_proj1, rhs_proj2, rhs_proj3});
-
-        //     if (lhs_max < rhs_min || rhs_max < lhs_min) std::array<Vector<T>, 3> rhs_normals {
-        //     Vector<T> {
-        //         -(lhs.p2_.y_ - lhs.p1_.y_),
-        //         lhs.p2_.x_ - lhs.p1_.x_
-        //     },
-        //     Vector<T> {
-        //         -(lhs.p3_.y_ - lhs.p1_.y_),
-        //         lhs.p3_.x_ - lhs.p1_.x_
-        //     },
-        //     Vector<T> {
-        //         -(lhs.p3_.y_ - lhs.p2_.y_),
-        //         lhs.p3_.x_ - lhs.p2_.x_
-        //     }
-        // };
-
-        // for (const Vector<T> &n : normals) {
-        //     T lhs_proj1 = n.edot(Vector<T> {lhs.p1_});
-        //     T lhs_proj2 = n.edot(Vector<T> {lhs.p2_});
-        //     T lhs_proj3 = n.edot(Vector<T> {lhs.p3_});
-        //     T lhs_min = std::min({lhs_proj1, lhs_proj2, lhs_proj3});
-        //     T lhs_max = std::max({lhs_proj1, lhs_proj2, lhs_proj3});
-
-        //     T rhs_proj1 = n.edot(Vector<T> {lhs.p1_});
-        //     T rhs_proj2 = n.edot(Vector<T> {lhs.p2_});
-        //     T rhs_proj3 = n.edot(Vector<T> {lhs.p3_});
-        //     T rhs_min = std::min({rhs_proj1, rhs_proj2, rhs_proj3});
-        //     T rhs_max = std::max({rhs_proj1, rhs_proj2, rhs_proj3});
-
-        //     if (lhs_max < rhs_min || rhs_max < lhs_min) 
-        //         return false;
-        // }
-        //         return false;
-        // }
+        if (!lhs_2d.normal_projection_intersection_2d_(rhs_2d))
+            return false;
+        if (!rhs_2d.normal_projection_intersection_2d_(lhs_2d))
+            return false;
         return true;
     }
 
@@ -181,15 +122,15 @@ template <std::floating_point T> class Triangle {
 
     bool intersects_plane_(const Plane<T> &plane) const {
         T dist1 = plane.signed_distance(p1_);
-        if (is_null(dist1))
+        if (zero<T>(dist1))
             return true;
 
         T dist2 = plane.signed_distance(p2_);
-        if ((is_null(dist2)) || (dist1 * dist2 < 0))
+        if ((zero<T>(dist2)) || (dist1 * dist2 < 0))
             return true;
 
         T dist3 = plane.signed_distance(p3_);
-        if ((is_null(dist3)) || (dist2 * dist3 < 0))
+        if ((zero<T>(dist3)) || (dist2 * dist3 < 0))
             return true;
 
         return false;
@@ -204,11 +145,11 @@ template <std::floating_point T> class Triangle {
         const Point<T> &line_p = line.point();
 
         T proj1 = line_dir.edot(Vector{line_p, p1});
-        if is_null(sdist1)
+        if (zero<T>(sdist1))
             return proj1;
 
         T proj2 = line_dir.edot(Vector{line_p, p2});
-        if is_null(sdist2)
+        if (zero<T>(sdist2))
             return proj2;
         if (sdist1 * sdist2 > 0)
             return std::numeric_limits<T>::quiet_NaN();
@@ -222,14 +163,13 @@ template <std::floating_point T> class Triangle {
         T sdist2 = plane.signed_distance(p2_);
         T sdist3 = plane.signed_distance(p3_);
 
-        T t0 = line_intersection_point_(line, p1_, sdist1, p2_ sdist2);
-        T t1 = line_intersection_point_(line, p1_, sdist1, p3_ sdist3);
-        if (!is_valid(t0))
-            t0 = line_intersection_point_(line, p2_, sdist2, p3_ sdist3);
-        else if (!is_valid(t1))
-            t1 = line_intersection_point_(line, p2_, sdist2,
-                                          p3_ sdist3);
-        assert(is_valid(t0) && is_valid(t1));
+        T t0 = line_intersection_point_(line, p1_, sdist1, p2_, sdist2);
+        T t1 = line_intersection_point_(line, p1_, sdist1, p3_, sdist3);
+        if (!valid(t0))
+            t0 = line_intersection_point_(line, p2_, sdist2, p3_, sdist3);
+        else if (!valid(t1))
+            t1 = line_intersection_point_(line, p2_, sdist2, p3_, sdist3);
+        assert(valid(t0) && valid(t1));
         return std::pair<T, T>{t0, t1}; // can be the same
     }
 
@@ -248,7 +188,7 @@ public:
         validate();
     }
 
-    bool valid() const {
+    bool is_valid() const {
         return kind_ != Kind::INVALID;
     }
 
@@ -258,10 +198,14 @@ public:
         rhs.check_validity();
 
         Plane<T> lhs_plane = get_plane();
+        assert(lhs_plane.is_valid());
+
         if (!rhs.intersects_plane_(lhs_plane))
             return false;
 
         Plane<T> rhs_plane = rhs.get_plane();
+        assert(rhs_plane.is_valid());
+
         if (lhs_plane == rhs_plane)
             return intersects_2d_(rhs);
         
@@ -269,22 +213,22 @@ public:
             return false;
 
         Line<T> common_line {lhs_plane, rhs_plane};
+        assert(common_line.is_valid());
+
         std::pair<T, T> lhs_t = line_intersection_(common_line, rhs_plane);
         std::pair<T, T> rhs_t = rhs.line_intersection_(common_line, lhs_plane);
-        T a = std::min(lhs_t.first, lhs_t.second);
-        T t1 = t.second;
 
         T a = std::max(
             std::min(lhs_t.first, lhs_t.second),
-            std::min(rhs_t.first, rhs_t.second),
+            std::min(rhs_t.first, rhs_t.second)
         );
 
         T b = std::min(
             std::max(lhs_t.first, lhs_t.second), 
-            std::max(lhs_t.first, lhs_t.second), 
+            std::max(lhs_t.first, lhs_t.second)
         );
 
-        return is_equal(a, b, eps_) || (a < b);
+        return equal<T>(a, b, eps_) || (a < b);
     }
 
     Plane<T> get_plane() const {

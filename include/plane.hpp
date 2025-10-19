@@ -18,12 +18,12 @@ template <std::floating_point T> class Plane {
 
     bool validity_{false};
     void validate() {
-        if (p_.valid() && n_.valid() && !n_.is_null())
+        if (p_.is_valid() && n_.is_valid() && !n_.is_zero())
             validity_ = true;
     }
 
-    void check_validity() {
-        if (!valid())
+    void check_validity() const {
+        if (!is_valid())
             throw std::logic_error(to_string() + " is not valid");
     }
 
@@ -38,11 +38,13 @@ public:
         validate();
     }
 
-    bool valid() const {
+    bool is_valid() const {
         return validity_;
     }
 
-    const Vector<T> &normal() return n_;
+    const Vector<T>& normal() const {
+        return n_;
+    }
 
     bool operator==(const Plane<T> &rhs) const {
         check_validity();
@@ -52,7 +54,7 @@ public:
     }
 
     bool operator!=(const Plane<T> &rhs) const {
-        return !(*this == rhs)
+        return !(*this == rhs);
     }
 
     bool contains(const Point<T> &point) const {
@@ -68,7 +70,7 @@ public:
         check_validity();
         point.check_validity();
 
-        return n_.edot(Vector{plane.p_, point});
+        return n_.edot(Vector{p_, point});
     }
 
     // L: (n_, r) + D = 0
@@ -81,7 +83,7 @@ public:
         check_validity();
         rhs.check_validity();
 
-        return n_.collinear_with(rhs.n_)
+        return n_.collinear_with(rhs.n_);
     }
 
     std::string to_string() const {

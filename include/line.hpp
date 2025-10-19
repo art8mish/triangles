@@ -13,23 +13,24 @@
 
 namespace triangles {
 template <std::floating_point T> class Line {
+    T eps_{get_epsilon<T>()};
+
     // L: p_ + vec(d_) * t
     Point<T> p_{};
     Vector<T> d_{};
 
     bool validity_{false};
     void validate() {
-        if (p_.valid() && d_.valid() && !d_.is_null())
+        if (p_.is_valid() && d_.is_valid() && !d_.is_zero())
             validity_ = true;
     }
 
-    void check_validity() {
-        if (!valid())
+    void check_validity() const {
+        if (!is_valid())
             throw std::logic_error(to_string() + " is not valid");
     }
 
 public:
-    Line() = default;
     Line(const Point<T> &p1, const Point<T> &p2)
         : p_{p1}, d_{p1, p2} {
         validate();
@@ -50,7 +51,7 @@ public:
         const Vector<T> &n2 = plane2.normal();
 
         d_ = n1.ecross(n2);
-        if (d_.is_null()) { // planes are parallel
+        if (d_.is_zero()) { // planes are parallel
             validate();
             throw std::logic_error(
                 "Can't find intersection line: planes are parallel "
@@ -68,7 +69,7 @@ public:
         T n_dot_sqr = n_dot * n_dot;
 
         T denom = n1_sqr * n2_sqr - n_dot_sqr; // > 0
-        assert(!is_null(denom));
+        assert(!zero<T>(denom, eps_));
 
         T a = (D2 * n_dot - D1 * n2_sqr) / denom;
         T b = (D1 * n_dot - D2 * n1_sqr) / denom;
@@ -83,9 +84,9 @@ public:
         // const T &ady = std::abs(d_.y());
         // const T &adz = std::abs(d_.z());
 
-        // T px = get_null<T>();
-        // T py = get_null<T>();
-        // T pz = get_null<T>();
+        // T px = get_zero<T>();
+        // T py = get_zero<T>();
+        // T pz = get_zero<T>();
         // if (adz >= adx && adz >= ady) { // z = 0
         //     auto pair = solve_system(n1.x(), n1.y(), plane1.D(),
         //                              n2.x(), n2.y(), plane2.D());
@@ -104,7 +105,7 @@ public:
         // }
     }
 
-    bool valid() const {
+    bool is_valid() const {
         return validity_;
     }
 
@@ -123,7 +124,7 @@ public:
         return contains(other.p_) && d_.collinear_with(other.d_);
     }
     bool operator!=(const Line<T> &other) const {
-        return !(*this == other)
+        return !(*this == other);
     }
 
     bool parallel_to(const Line<T> &other) const {

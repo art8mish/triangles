@@ -17,6 +17,9 @@ set(TEST_POINT_SRC ${TESTS_DIR}/point_tests.cpp)
 set(TEST_VECTOR vector_tests)
 set(TEST_VECTOR_SRC ${TESTS_DIR}/vector_tests.cpp)
 
+set(TEST_LINE line_tests)
+set(TEST_LINE_SRC ${TESTS_DIR}/line_tests.cpp)
+
 add_compile_options(
     -D DEBUG
     -g
@@ -49,3 +52,6 @@ target_link_libraries(${TEST_POINT} gtest gmock pthread)
 
 add_executable(${TEST_VECTOR} ${TEST_VECTOR_SRC})
 target_link_libraries(${TEST_VECTOR} gtest gmock pthread)
+
+add_executable(${TEST_LINE} ${TEST_LINE_SRC})
+target_link_libraries(${TEST_LINE} gtest gmock pthread)

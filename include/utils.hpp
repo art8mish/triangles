@@ -16,7 +16,7 @@ template <std::floating_point T = double> T get_epsilon() {
         return 1e-6f;
 }
 
-// template <std::floating_point T = double> T get_null() {
+// template <std::floating_point T = double> T get_zero() {
 //     if (std::is_same_v<T, double>)
 //         return 0.0;
 //     else if (std::is_same_v<T, long double>)
@@ -31,12 +31,12 @@ bool equal(const T &num1, const T &num2, const T &eps) {
 }
 
 template <std::floating_point T = double>
-bool is_null(const T &num, const T &eps) {
+bool zero(const T &num, const T &eps) {
     return std::abs(num) < eps;
 }
 
 template <std::floating_point T = double>
-bool is_valid(const T &num) {
+bool valid(const T &num) {
     return std::isfinite(num) && !std::isnan(num);
 }
 
@@ -51,7 +51,7 @@ std::pair<T, T> solve_system(const T &a1, const T &b1, const T &c1,
     T y = std::numeric_limits<T>::quiet_NaN();
 
     T det = a1 * b2 - a2 * b1;
-    if (!is_null<T>(det)) {
+    if (!zero<T>(det)) {
         x = (c2 * b1 - c1 * b2) / det;
         y = (c1 * a2 - c2 * a1) / det;
     }

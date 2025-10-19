@@ -18,12 +18,12 @@ template <std::floating_point T> class Vector {
 
     bool validity_{false};
     void validate() {
-        if (is_valid(dx_) && is_valid(dy_) && is_valid(dz_))
+        if (valid(dx_) && valid(dy_) && valid(dz_))
             validity_ = true;
     }
 
-    void check_validity() {
-        if (!valid())
+    void check_validity() const {
+        if (!is_valid())
             throw std::logic_error(to_string() + " is not valid");
     }
 
@@ -52,68 +52,38 @@ public:
         validate();
     }
 
-    bool valid() const {
+    bool is_valid() const {
         return validity_;
     }
 
-    const T &x() {
-        return x_;
+    const T &x() const {
+        return dx_;
     }
-    const T &y() {
-        return y_;
+    const T &y() const {
+        return dy_;
     }
-    const T &z() {
-        return z_;
+    const T &z() const {
+        return dz_;
     }
 
     bool operator==(const Vector<T> &rhs) const {
         check_validity();
         rhs.check_validity();
 
-        return equal(dx_, rhs.dx_, eps_) &&
-               equal(dy_, rhs.dy_, eps_) &&
-               equal(dz_, rhs.dz_, eps_);
+        return equal<T>(dx_, rhs.dx_, eps_) &&
+               equal<T>(dy_, rhs.dy_, eps_) &&
+               equal<T>(dz_, rhs.dz_, eps_);
     }
 
     bool operator!=(const Vector<T> &rhs) const {
-        return !(*this == rhs)
+        return !(*this == rhs);
     }
 
-    bool is_null() const {
+    bool is_zero() const {
         check_validity();
 
-        return is_null(dx_, eps_) && is_null(dy_, eps_) &&
-               is_null(dz_, eps_);
-    }
-
-    bool collinear_with(const Vector<T> &rhs) const {
-        check_validity();
-        rhs.check_validity();
-        return ecross(rhs).is_null();
-
-        // T k_x = dx_ / rhs.dx_;
-        // T k_y = dy_ / rhs.dy_;
-        // T k_z = dz_ / rhs.dz_;
-        // return equal(k_x, k_y, eps_)
-        //     && equal(k_y, k_z, eps_);
-    }
-
-    bool orthogonal_to(const Vector<T> &rhs) const {
-        check_validity();
-        rhs.check_validity();
-
-        return is_null(edot(rhs), eps_);
-    }
-
-    Vector<T> get_perpendicular() {
-        check_validity();
-
-        if (std::abs(dx_) < std::abs(dy_) && std::abs(dx_) < std::abs(dz_))
-            return ecross(n, Vector<T> {1, 0, 0});
-        else if (std::abs(dy_) < std::abs(dz_))
-            return ecross(n, Vector<T> {0, 1, 0});
-        else
-            return ecross(n, Vector<T> {0, 0, 1});
+        return zero<T>(dx_, eps_) && zero<T>(dy_, eps_) &&
+               zero<T>(dz_, eps_);
     }
 
     T edot(const Vector<T> &rhs) const {
@@ -128,6 +98,38 @@ public:
         return Vector<T>{dy_ * rhs.dz_ - dz_ * rhs.dy_,
                          dz_ * rhs.dx_ - dx_ * rhs.dz_,
                          dx_ * rhs.dy_ - dy_ * rhs.dx_};
+    }
+
+    bool collinear_with(const Vector<T> &rhs) const {
+        check_validity();
+        rhs.check_validity();
+        return ecross(rhs).is_zero();
+
+        // T k_x = dx_ / rhs.dx_;
+        // T k_y = dy_ / rhs.dy_;
+        // T k_z = dz_ / rhs.dz_;
+        // return equal<T>(k_x, k_y, eps_)
+        //     && equal<T>(k_y, k_z, eps_);
+    }
+
+    bool orthogonal_to(const Vector<T> &rhs) const {
+        check_validity();
+        rhs.check_validity();
+
+        return zero<T>(edot(rhs), eps_);
+    }
+
+    Vector<T> get_perpendicular() {
+        check_validity();
+        if (is_zero())
+            return Vector<T> {};
+
+        if (std::abs(dx_) < std::abs(dy_) && std::abs(dx_) < std::abs(dz_))
+            return ecross(Vector<T> {1, 0, 0});
+        else if (std::abs(dy_) < std::abs(dz_))
+            return ecross(Vector<T> {0, 1, 0});
+        else
+            return ecross(Vector<T> {0, 0, 1});
     }
 
     std::string to_string() const {
