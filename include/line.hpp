@@ -13,7 +13,7 @@
 
 namespace triangles {
 template <std::floating_point T> class Line {
-    T eps_{get_epsilon<T>()};
+    T eps_{epsilon<T>()};
 
     // L: p_ + vec(d_) * t
     Point<T> p_{};
@@ -31,16 +31,14 @@ template <std::floating_point T> class Line {
     }
 
 public:
-    Line(const Point<T> &p1, const Point<T> &p2)
-        : p_{p1}, d_{p1, p2} {
-        validate();
-    }
-
     Line(const T &x1, const T &y1, const T &z1, const T &x2,
          const T &y2, const T &z2)
         : p_{x1, y1, z1}, d_{x1, y1, z1, x2, y2, z2} {
         validate();
     }
+
+    Line(const Point<T> &p1, const Point<T> &p2)
+        : Line(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z) {}
 
     Line(const Point<T> &p, const Vector<T> &v) : p_{p}, d_{v} {
         validate();
@@ -74,46 +72,22 @@ public:
         T a = (D2 * n_dot - D1 * n2_sqr) / denom;
         T b = (D1 * n_dot - D2 * n1_sqr) / denom;
 
-        p_.x_ = a * n1.x() + b * n2.x();
-        p_.y_ = a * n1.y() + b * n2.y();
-        p_.z_ = a * n1.z() + b * n2.z();
+        p_.x = a * n1.x() + b * n2.x();
+        p_.y = a * n1.y() + b * n2.y();
+        p_.z = a * n1.z() + b * n2.z();
 
         validate();
-
-        // const T &adx = std::abs(d_.x());
-        // const T &ady = std::abs(d_.y());
-        // const T &adz = std::abs(d_.z());
-
-        // T px = get_zero<T>();
-        // T py = get_zero<T>();
-        // T pz = get_zero<T>();
-        // if (adz >= adx && adz >= ady) { // z = 0
-        //     auto pair = solve_system(n1.x(), n1.y(), plane1.D(),
-        //                              n2.x(), n2.y(), plane2.D());
-        //     px = pair.first;
-        //     py = pair.second;
-        // } else if (adx >= ady && adx >= adz) { // x = 0
-        //     auto pair = solve_system(n1.y(), n1.z(), plane1.D(),
-        //                              n2.y(), n2.z(), plane2.D());
-        //     py = pair.first;
-        //     pz = pair.second;
-        // } else if (ady >= adx && ady >= adz) { // y = 0
-        //     auto pair = solve_system(n1.x(), n1.z(), plane1.D(),
-        //                              n2.x(), n2.z(), plane2.D());
-        //     px = pair.first;
-        //     pz = pair.second;
-        // }
     }
 
     bool is_valid() const {
         return validity_;
     }
 
-    const Vector<T> &direction() const {
+    const Vector<T> &direction() const & {
         return d_;
     }
 
-    const Point<T> &point() const {
+    const Point<T> &point() const & {
         return p_;
     }
 

@@ -1,57 +1,49 @@
-cmake_minimum_required(VERSION 3.28.3)
+cmake_minimum_required(VERSION 3.12)
+project(triangles LANGUAGES CXX)
+enable_testing()
 
-set(TARGET triangles)
-project(${TARGET})
+set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
+set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set(TESTS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
-set(SRC_DIR src)
-set(INCLUDE_DIR include)
+find_package(GTest REQUIRED)
+ 
+function(add_warnings target)
+    target_compile_options(${target} PRIVATE
+        -Werror
+        -Wall
+        -Wextra
+        -Wpedantic
+        -Wcast-align
+        -Wcast-qual
+        -Wconversion
+        -Wold-style-cast
+        -Wredundant-decls
+        -Wsign-conversion
+        -Wsign-promo
+    )
+endfunction()
 
-set(SRC ${SRC_DIR}/triangles.cpp)
+function(add_proj_exec target)
+    add_executable(${target} ${ARGN})
+    target_include_directories(${target} PRIVATE ${INCLUDE_DIR})
+    target_compile_features(${target} PRIVATE cxx_std_20)
+    add_warnings(${target})
+endfunction()
+
+function(add_proj_test target)
+    add_executable(${target} ${ARGN})
+    target_include_directories(${target} PRIVATE ${INCLUDE_DIR})
+    target_compile_features(${target} PRIVATE cxx_std_20)
+    target_link_libraries(${target} PRIVATE GTest::gtest GTest::gtest_main)
+    add_warnings(${target})
+    add_test(NAME ${target} COMMAND ${target})
+endfunction()
 
 
-set(TESTS_DIR tests)
+add_proj_exec(triangles ${SRC_DIR}/triangles.cpp)
 
-set(TEST_POINT point_tests)
-set(TEST_POINT_SRC ${TESTS_DIR}/point_tests.cpp)
-
-set(TEST_VECTOR vector_tests)
-set(TEST_VECTOR_SRC ${TESTS_DIR}/vector_tests.cpp)
-
-set(TEST_LINE line_tests)
-set(TEST_LINE_SRC ${TESTS_DIR}/line_tests.cpp)
-
-add_compile_options(
-    -D DEBUG
-    -g
-    
-    -std=c++20
-
-    -Werror
-    -Wall
-    -Wextra
-    -Wpedantic
-    -Wcast-align
-    -Wcast-qual
-    -Wconversion
-    -Wctor-dtor-privacy
-    -Wenum-compare
-    -Wfloat-equal
-    -Wnon-virtual-dtor
-    -Wold-style-cast
-    -Woverloaded-virtual
-    -Wredundant-decls
-    -Wsign-conversion
-    -Wsign-promo
-)
-
-include_directories(${INCLUDE_DIR})
-add_executable(${TARGET} ${SRC})
-
-add_executable(${TEST_POINT} ${TEST_POINT_SRC})
-target_link_libraries(${TEST_POINT} gtest gmock pthread)
-
-add_executable(${TEST_VECTOR} ${TEST_VECTOR_SRC})
-target_link_libraries(${TEST_VECTOR} gtest gmock pthread)
-
-add_executable(${TEST_LINE} ${TEST_LINE_SRC})
-target_link_libraries(${TEST_LINE} gtest gmock pthread)
+add_proj_test(line_tests ${TESTS_DIR}/line_tests.cpp)
+add_proj_test(point_tests ${TESTS_DIR}/point_tests.cpp)
+add_proj_test(vector_tests ${TESTS_DIR}/vector_tests.cpp)
+add_proj_test(plane_tests ${TESTS_DIR}/plane_tests.cpp)

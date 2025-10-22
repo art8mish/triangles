@@ -28,21 +28,18 @@ template <std::floating_point T> class Plane {
     }
 
 public:
-    Plane() = default;
     Plane(const Point<T> &p, const Vector<T> &n) : p_{p}, n_{n} {
         validate();
     }
 
     Plane(const Point<T> &p1, const Point<T> &p2, const Point<T> &p3)
-        : p_{p1}, n_{Vector<T>{p1, p2}.ecross(Vector<T>{p1, p3})} {
-        validate();
-    }
+        : Plane(p1, Vector<T>{p1, p2}.ecross(Vector<T>{p1, p3})) {}
 
     bool is_valid() const {
         return validity_;
     }
 
-    const Vector<T>& normal() const {
+    const Vector<T>& normal() const & {
         return n_;
     }
 
@@ -79,11 +76,11 @@ public:
         return -n_.edot(p_);
     }
 
-    bool parallel_to(const Plane<T> &rhs) const {
+    bool parallel_to(const Plane<T> &other) const {
         check_validity();
-        rhs.check_validity();
+        other.check_validity();
 
-        return n_.collinear_with(rhs.n_);
+        return n_.collinear_with(other.n_);
     }
 
     std::string to_string() const {

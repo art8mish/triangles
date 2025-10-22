@@ -7,13 +7,17 @@
 namespace triangles {
 const char *LOG_PATH = "logs/triangles.log";
 
-template <std::floating_point T = double> T get_epsilon() {
+template <std::floating_point T> T epsilon() {
     if (std::is_same_v<T, double>)
         return 1e-9;
     else if (std::is_same_v<T, long double>)
         return 1e-12L;
     else
         return 1e-6f;
+}
+
+template <std::floating_point T> T nan() {
+    return std::numeric_limits<T>::quiet_NaN();
 }
 
 // template <std::floating_point T = double> T get_zero() {
@@ -47,8 +51,8 @@ bool valid(const T &num) {
 template <std::floating_point T = double>
 std::pair<T, T> solve_system(const T &a1, const T &b1, const T &c1,
                              const T &a2, const T &b2, const T &c2) {
-    T x = std::numeric_limits<T>::quiet_NaN();
-    T y = std::numeric_limits<T>::quiet_NaN();
+    T x = nan<T>();
+    T y = nan<T>();
 
     T det = a1 * b2 - a2 * b1;
     if (!zero<T>(det)) {

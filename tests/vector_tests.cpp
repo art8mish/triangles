@@ -9,13 +9,14 @@
 
 using triangles::zero;
 using triangles::equal;
+using triangles::nan;
 
 class TestVector : public ::testing::Test
 {
 protected:
     using vec_t = typename triangles::Vector<double>;
     using point_t = typename triangles::Point<double>;
-    double eps_ = triangles::get_epsilon<double>();
+    double eps_ = triangles::epsilon<double>();
 
     void SetUp() {};
     void TearDown() {};
@@ -96,6 +97,8 @@ TEST_F(TestVector, LowDimensions) {
 
 TEST_F(TestVector, Equality) {
     vec_t vec_zero {0.0, 0.0, 0.0};
+    ASSERT_EQ(true, vec_zero == vec_zero);
+
     vec_t vec_zero_eq {0.0, 0.0, 0.0};
     ASSERT_EQ(true, vec_zero == vec_zero_eq);
     ASSERT_EQ(false, vec_zero != vec_zero_eq);
@@ -105,13 +108,21 @@ TEST_F(TestVector, Equality) {
     ASSERT_EQ(true, vec_zero != vec_zero_neq);
 
     vec_t vec_delta {16.2, 7.56, 0.0};
+    ASSERT_EQ(true, vec_delta == vec_delta);
+
     vec_t vec_delta_eq {16.2, 7.56, 0.0};
     ASSERT_EQ(true, vec_delta == vec_delta_eq);
     ASSERT_EQ(false, vec_delta != vec_delta_eq);
 
+    ASSERT_EQ(true, (vec_delta == vec_delta_eq) == (vec_delta_eq == vec_delta));
+    ASSERT_EQ(true, (vec_delta != vec_delta_eq) == (vec_delta_eq != vec_delta));
+
     vec_t vec_delta_neq {-16.2, 7.56, 0.0};
-    ASSERT_EQ(false, vec_zero == vec_zero_neq);
-    ASSERT_EQ(true, vec_zero != vec_zero_neq);
+    ASSERT_EQ(false, vec_delta == vec_delta_neq);
+    ASSERT_EQ(true, vec_delta != vec_delta_neq);
+
+    ASSERT_EQ(true, (vec_delta == vec_delta_neq) == (vec_delta_neq == vec_delta));
+    ASSERT_EQ(true, (vec_delta != vec_delta_neq) == (vec_delta_neq != vec_delta));
 
     point_t p_from = {0.0, 0.0, 0.0};
     point_t p_to = {16.2, 7.56, -15.3};
@@ -120,24 +131,39 @@ TEST_F(TestVector, Equality) {
     ASSERT_EQ(true, vec_points == vec_points_eq);
     ASSERT_EQ(false, vec_points != vec_points_eq);
 
+    ASSERT_EQ(true, (vec_points == vec_points_eq) == (vec_points_eq == vec_points));
+    ASSERT_EQ(true, (vec_points != vec_points_eq) == (vec_points_eq != vec_points));
+
     point_t p_to_neq = {16.2, 7.56, -15.31};
     vec_t vec_points_neq_1 {p_from, p_to_neq};
     ASSERT_EQ(false, vec_points == vec_points_neq_1);
     ASSERT_EQ(true, vec_points != vec_points_neq_1);
+
+    ASSERT_EQ(true, (vec_points == vec_points_neq_1) == (vec_points_neq_1 == vec_points));
+    ASSERT_EQ(true, (vec_points != vec_points_neq_1) == (vec_points_neq_1 != vec_points));
 
     point_t p_from_neq = {0.0, 0.001, 0.0};
     vec_t vec_points_neq_2 {p_from_neq, p_to};
     ASSERT_EQ(false, vec_points == vec_points_neq_2);
     ASSERT_EQ(true, vec_points != vec_points_neq_2);
 
+    ASSERT_EQ(true, (vec_points == vec_points_neq_2) == (vec_points_neq_2 == vec_points));
+    ASSERT_EQ(true, (vec_points != vec_points_neq_2) == (vec_points_neq_2 != vec_points));
+
     vec_t vec_nums {0, 25.4, 6.7, 15.4, 94.3, 2.4};
     vec_t vec_nums_eq {0, 25.4, 6.7, 15.4, 94.3, 2.4};
     ASSERT_EQ(true, vec_nums == vec_nums_eq);
     ASSERT_EQ(false, vec_nums != vec_nums_eq);
 
+    ASSERT_EQ(true, (vec_nums == vec_nums_eq) == (vec_nums_eq == vec_nums));
+    ASSERT_EQ(true, (vec_nums != vec_nums_eq) == (vec_nums_eq != vec_nums));
+
     vec_t vec_nums_neq {0, 25.4, 6.8, 15.4, 94.3, 2.4};
     ASSERT_EQ(false, vec_nums == vec_nums_neq);
     ASSERT_EQ(true, vec_nums != vec_nums_neq);
+
+    ASSERT_EQ(true, (vec_nums == vec_nums_neq) == (vec_nums_neq == vec_nums));
+    ASSERT_EQ(true, (vec_nums != vec_nums_neq) == (vec_nums_neq != vec_nums));
 }
 
 TEST_F(TestVector, Edot) {
@@ -189,36 +215,46 @@ TEST_F(TestVector, Collinearity) {
     vec_t vec_zero1 {};
     vec_t vec_zero2 {};
     ASSERT_EQ(true, vec_zero1.collinear_with(vec_zero2));
+    ASSERT_EQ(true, vec_zero2.collinear_with(vec_zero1));
 
     vec_t vec_main {2, 5, -3};
     ASSERT_EQ(true, vec_main.collinear_with(vec_zero1));
+    ASSERT_EQ(true, vec_zero1.collinear_with(vec_main));
 
     vec_t vec_col1 {6, 15, -9};
     ASSERT_EQ(true, vec_main.collinear_with(vec_col1));
+    ASSERT_EQ(true, vec_col1.collinear_with(vec_main));
 
     vec_t vec_reverse1 {-2, -5, 3};
     ASSERT_EQ(true, vec_main.collinear_with(vec_reverse1));
+    ASSERT_EQ(true, vec_reverse1.collinear_with(vec_main));
 
     vec_t vec_reverse2 {-4, -10, 6};
     ASSERT_EQ(true, vec_main.collinear_with(vec_reverse2));
+    ASSERT_EQ(true, vec_reverse2.collinear_with(vec_main));
 
     vec_t vec_not_col {0, 5, 3};
     ASSERT_EQ(false, vec_main.collinear_with(vec_not_col));
+    ASSERT_EQ(false, vec_not_col.collinear_with(vec_main));
 }
 
 TEST_F(TestVector, Orthogonality) {
     vec_t vec_zero1 {};
     vec_t vec_zero2 {};
     ASSERT_EQ(true, vec_zero1.orthogonal_to(vec_zero2));
+    ASSERT_EQ(true, vec_zero2.orthogonal_to(vec_zero1));
 
     vec_t vec_main {2, 5, -3};
     ASSERT_EQ(true, vec_main.orthogonal_to(vec_zero1));
+    ASSERT_EQ(true, vec_zero1.orthogonal_to(vec_main));
 
     vec_t vec_orthogonal {4, -1, 1};
     ASSERT_EQ(true, vec_main.orthogonal_to(vec_orthogonal));
+    ASSERT_EQ(true, vec_orthogonal.orthogonal_to(vec_main));
 
     vec_t vec_not_orthogonal {-3, 2, 4};
     ASSERT_EQ(false, vec_main.orthogonal_to(vec_not_orthogonal));
+    ASSERT_EQ(false, vec_not_orthogonal.orthogonal_to(vec_main));
 }
 
 TEST_F(TestVector, GetPerpendicular) {
@@ -247,7 +283,7 @@ TEST_F(TestVector, GetPerpendicular) {
 }
 
 TEST_F(TestVector, InvalidStateExceptions) {
-    vec_t vec_invalid {1, 2, std::numeric_limits<double>::quiet_NaN()};
+    vec_t vec_invalid {1, 2, nan<double>()};
     ASSERT_EQ(false, vec_invalid.is_valid());
 
     EXPECT_THROW(vec_invalid.is_zero(), std::logic_error);
@@ -273,10 +309,4 @@ TEST_F(TestVector, InvalidStateExceptions) {
 
     EXPECT_THROW(vec_valid.orthogonal_to(vec_invalid), std::logic_error);
     EXPECT_THROW(vec_invalid.orthogonal_to(vec_valid), std::logic_error);
-}
-
-int main(int argc, char *argv[])
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
 }

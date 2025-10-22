@@ -9,20 +9,20 @@
 
 namespace triangles {
 template <std::floating_point T> class Point {
-    T eps_{get_epsilon<T>()};
+    T eps_{epsilon<T>()};
 
 public:
-    T x_ {0};
-    T y_ {0};
-    T z_ {0};
+    T x {0};
+    T y {0};
+    T z {0};
 
     Point() = default;
-    Point(const T &x, const T &y, const T &z) : x_{x}, y_{y}, z_{z} {}
+    Point(const T &x, const T &y, const T &z) : x{x}, y{y}, z{z} {}
     Point(const T &x, const T &y) : Point(x, y, 0) {}
     Point(const T &x) : Point(x, 0, 0) {}
 
     bool is_valid() const {
-        return valid(x_) && valid(y_) && valid(z_);
+        return valid(x) && valid(y) && valid(z);
     }
 
     void check_validity() const {
@@ -33,16 +33,16 @@ public:
     bool is_zero() const {
         check_validity();
 
-        return zero<T>(x_, eps_) && zero<T>(y_, eps_) &&
-               zero<T>(z_, eps_);
+        return zero<T>(x, eps_) && zero<T>(y, eps_) &&
+               zero<T>(z, eps_);
     }
 
     bool operator==(const Point<T> &rhs) const {
         check_validity();
         rhs.check_validity();
 
-        return equal<T>(x_, rhs.x_, eps_) &&
-            equal<T>(y_, rhs.y_, eps_) && equal<T>(z_, rhs.z_, eps_);
+        return equal<T>(x, rhs.x, eps_) &&
+            equal<T>(y, rhs.y, eps_) && equal<T>(z, rhs.z, eps_);
     }
 
     bool operator!=(const Point<T> &rhs) const {
@@ -50,8 +50,8 @@ public:
     }
 
     std::string to_string() const {
-        return "Point(" + std::to_string(x_) + ", " +
-               std::to_string(y_) + ", " + std::to_string(z_) + ")";
+        return "Point(" + std::to_string(x) + ", " +
+               std::to_string(y) + ", " + std::to_string(z) + ")";
     }
 };
 } // namespace triangles

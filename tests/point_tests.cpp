@@ -3,6 +3,8 @@
 
 #include <point.hpp>
 
+using triangles::nan;
+
 class TestPoint : public ::testing::Test
 {
 protected:
@@ -25,10 +27,10 @@ TEST_F(TestPoint, DefaultInit) {
 }
 
 TEST_F(TestPoint, Invalid) {
-    point_t p_def1 {std::numeric_limits<double>::quiet_NaN(), 5.6, 10.43 };
+    point_t p_def1 {nan<double>(), 5.6, 10.43 };
     ASSERT_EQ(false, p_def1.is_valid());
 
-    point_t p_def2 {0, 0, std::numeric_limits<double>::quiet_NaN()};
+    point_t p_def2 {0, 0, nan<double>()};
     ASSERT_EQ(false, p_def1.is_valid());
 }
 
@@ -184,14 +186,20 @@ TEST_F(TestPoint, Zero_LongDouble) {
 
 TEST_F(TestPoint, Equal_Int) {
     point_t p_int {0, 734, -632};
-    point_t p_int_eq {0, 734, -632};
+    ASSERT_EQ(true, p_int == p_int);
 
+    point_t p_int_eq {0, 734, -632};
     ASSERT_EQ(true, p_int == p_int_eq);
     ASSERT_EQ(false, p_int != p_int_eq);
+    ASSERT_EQ(true, (p_int == p_int_eq) == (p_int_eq == p_int));
+    ASSERT_EQ(true, (p_int != p_int_eq) == (p_int_eq != p_int));
+
 
     point_t p_int_neq {1, 734, 632};
     ASSERT_EQ(false, p_int == p_int_neq);
     ASSERT_EQ(true, p_int != p_int_neq);
+    ASSERT_EQ(true, (p_int == p_int_neq) == (p_int_neq == p_int));
+    ASSERT_EQ(true, (p_int != p_int_neq) == (p_int_neq != p_int));
 
     point_t p_zero_int {0, 0, 0};
     point_t p_zero_int_eq {0, 0, 0};
@@ -205,14 +213,19 @@ TEST_F(TestPoint, Equal_Int) {
 
 TEST_F(TestPoint, Equal_Float) {
     point_float_t p_float {26.211f, -51.2f, 125.3f};
-    point_float_t p_float_eq {26.211f, -51.2f, 125.3f};
+    ASSERT_EQ(true, p_float == p_float);
 
+    point_float_t p_float_eq {26.211f, -51.2f, 125.3f};
     ASSERT_EQ(true, p_float == p_float_eq);
     ASSERT_EQ(false, p_float != p_float_eq);
+    ASSERT_EQ(true, (p_float == p_float_eq) == (p_float_eq == p_float));
+    ASSERT_EQ(true, (p_float != p_float_eq) == (p_float_eq != p_float));
 
     point_float_t p_float_neq {26.211f, -51.3f, 125.3f};
     ASSERT_EQ(false, p_float == p_float_neq);
     ASSERT_EQ(true, p_float != p_float_neq);
+    ASSERT_EQ(true, (p_float == p_float_neq) == (p_float_neq == p_float));
+    ASSERT_EQ(true, (p_float != p_float_neq) == (p_float_neq != p_float));
 
     point_float_t p_zero_float {0.0f, 0.0f, -0.0f};
     point_float_t p_zero_float_eq {0.0f, 0.0f, 0.0f};
@@ -227,14 +240,21 @@ TEST_F(TestPoint, Equal_Float) {
 
 TEST_F(TestPoint, Equal_Double) {
     point_double_t p_double {152.2, 833.516, 0.0};
-    point_double_t p_double_eq {152.2, 833.516, 0.0};
+    ASSERT_EQ(true, p_double == p_double);
 
+    point_double_t p_double_eq {152.2, 833.516, 0.0};
     ASSERT_EQ(true, p_double == p_double_eq);
     ASSERT_EQ(false, p_double != p_double_eq);
+
+    ASSERT_EQ(true, (p_double == p_double_eq) == (p_double_eq == p_double));
+    ASSERT_EQ(true, (p_double != p_double_eq) == (p_double_eq != p_double));
 
     point_double_t p_double_neq {26.211, 51.2, 125.3};
     ASSERT_EQ(false, p_double == p_double_neq);
     ASSERT_EQ(true, p_double != p_double_neq);
+
+    ASSERT_EQ(true, (p_double == p_double_neq) == (p_double_neq == p_double));
+    ASSERT_EQ(true, (p_double != p_double_neq) == (p_double_neq != p_double));
 
     point_double_t p_zero_double {0.0, 0.0, 0.0};
     point_double_t p_zero_double_eq {0.0, 0.0, 0.0};
@@ -248,13 +268,20 @@ TEST_F(TestPoint, Equal_Double) {
 
 TEST_F(TestPoint, Equal_LongDouble) {
     point_ldouble_t p_ldouble {152.2L, 833.516, -14L};
+    ASSERT_EQ(true, p_ldouble == p_ldouble);
+    
     point_ldouble_t p_ldouble_eq {152.2L, 833.516, -14L};
     ASSERT_EQ(true, p_ldouble == p_ldouble_eq);
     ASSERT_EQ(false, p_ldouble != p_ldouble_eq);
+    ASSERT_EQ(true, (p_ldouble == p_ldouble_eq) == (p_ldouble_eq == p_ldouble));
+    ASSERT_EQ(true, (p_ldouble != p_ldouble_eq) == (p_ldouble_eq != p_ldouble));
+    
 
     point_ldouble_t p_ldouble_neq {152.6L, 833.516, -14L};
     ASSERT_EQ(false, p_ldouble == p_ldouble_neq);
     ASSERT_EQ(true, p_ldouble != p_ldouble_neq);
+    ASSERT_EQ(true, (p_ldouble == p_ldouble_neq) == (p_ldouble_neq == p_ldouble));
+    ASSERT_EQ(true, (p_ldouble != p_ldouble_neq) == (p_ldouble_neq != p_ldouble));
 
     point_ldouble_t p_zero_ldouble {0.0L, 0.0L, 0.0L};
     point_ldouble_t p_zero_ldouble_eq {-0.0L, 0.0L, 0.0L};
@@ -269,10 +296,4 @@ TEST_F(TestPoint, Equal_LongDouble) {
 TEST_F(TestPoint, is_valid_DiffTypes) {
     point_ldouble_t p_diff_types {15.3426L, 75.24, 88.15};
     ASSERT_EQ(true, p_diff_types.is_valid());
-}
-
-int main(int argc, char *argv[])
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
 }
