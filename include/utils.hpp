@@ -29,17 +29,17 @@ template <std::floating_point T> T nan() {
 //         return 0.0f;
 // }
 
-template <std::floating_point T = double>
+template <std::floating_point T>
 bool equal(const T &num1, const T &num2, const T &eps) {
     return std::abs(num1 - num2) < eps;
 }
 
-template <std::floating_point T = double>
+template <std::floating_point T>
 bool zero(const T &num, const T &eps) {
     return std::abs(num) < eps;
 }
 
-template <std::floating_point T = double>
+template <std::floating_point T>
 bool valid(const T &num) {
     return std::isfinite(num) && !std::isnan(num);
 }

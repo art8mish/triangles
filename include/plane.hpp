@@ -33,7 +33,7 @@ public:
     }
 
     Plane(const Point<T> &p1, const Point<T> &p2, const Point<T> &p3)
-        : Plane(p1, Vector<T>{p1, p2}.ecross(Vector<T>{p1, p3})) {}
+        : Plane(p1, Vector<T>{p1, p2}.ecross(Vector<T>{p1, p3}).normalize()) {}
 
     bool is_valid() const {
         return validity_;

@@ -7,8 +7,6 @@
 #include <line.hpp>
 #include <utils.hpp>
 
-using triangles::zero;
-using triangles::equal;
 using triangles::nan;
 
 class TestLine : public ::testing::Test
@@ -28,40 +26,30 @@ TEST_F(TestLine, InitZero) {
     point_t p_zero2 {};
     line_t line_def_zero1 {p_zero1, p_zero2};
     ASSERT_EQ(false, line_def_zero1.is_valid());
-    ASSERT_EQ(true, line_def_zero1.point().is_valid());
-    ASSERT_EQ(true, line_def_zero1.point().is_zero());
-    ASSERT_EQ(true, line_def_zero1.direction().is_valid());
-    ASSERT_EQ(true, line_def_zero1.direction().is_zero());
+    ASSERT_THROW(line_def_zero1.point(), std::logic_error);
+    ASSERT_THROW(line_def_zero1.direction(), std::logic_error);
 
     vec_t vec_zero {};
     line_t line_def_zero2 {p_zero1, vec_zero};
     ASSERT_EQ(false, line_def_zero2.is_valid());
-    ASSERT_EQ(true, line_def_zero2.point().is_valid());
-    ASSERT_EQ(true, line_def_zero2.point().is_zero());
-    ASSERT_EQ(true, line_def_zero2.direction().is_valid());
-    ASSERT_EQ(true, line_def_zero2.direction().is_zero());
+    ASSERT_THROW(line_def_zero2.point(), std::logic_error);
+    ASSERT_THROW(line_def_zero2.direction(), std::logic_error);
 
     line_t line_def_zero3 {0, 0, 0, 0, 0, 0};
     ASSERT_EQ(false, line_def_zero3.is_valid());
-    ASSERT_EQ(true, line_def_zero3.point().is_valid());
-    ASSERT_EQ(true, line_def_zero3.point().is_zero());
-    ASSERT_EQ(true, line_def_zero3.direction().is_valid());
-    ASSERT_EQ(true, line_def_zero3.direction().is_zero());
+    ASSERT_THROW(line_def_zero3.point(), std::logic_error);
+    ASSERT_THROW(line_def_zero3.direction(), std::logic_error);
 
     line_t line_def_zero4 {4, 1, 3, 4, 1, 3};
     ASSERT_EQ(false, line_def_zero4.is_valid());
-    ASSERT_EQ(true, line_def_zero4.point().is_valid());
-    ASSERT_EQ(true, line_def_zero4.point().is_zero());
-    ASSERT_EQ(true, line_def_zero4.direction().is_valid());
-    ASSERT_EQ(true, line_def_zero4.direction().is_zero());
+    ASSERT_THROW(line_def_zero4.point(), std::logic_error);
+    ASSERT_THROW(line_def_zero4.direction(), std::logic_error);
 
     point_t p_zero_same {4, 1, 3};
     line_t line_def_zero5 {p_zero_same, p_zero_same};
     ASSERT_EQ(false, line_def_zero5.is_valid());
-    ASSERT_EQ(true, line_def_zero5.point().is_valid());
-    ASSERT_EQ(true, line_def_zero5.point().is_zero());
-    ASSERT_EQ(true, line_def_zero5.direction().is_valid());
-    ASSERT_EQ(true, line_def_zero5.direction().is_zero());
+    ASSERT_THROW(line_def_zero5.point(), std::logic_error);
+    ASSERT_THROW(line_def_zero5.direction(), std::logic_error);
 }
 
 TEST_F(TestLine, InitValid) {
@@ -116,7 +104,7 @@ TEST_F(TestLine, InitPlane) {
     ASSERT_EQ(true, plane3.normal().collinear_with(plane_n3));
     ASSERT_EQ(true, plane_n3.collinear_with(plane_n1));
 
-    EXPECT_THROW((line_t {plane1, plane3}), std::logic_error);
+    ASSERT_THROW((line_t {plane1, plane3}), std::logic_error);
 }
 
 
@@ -182,10 +170,10 @@ TEST_F(TestLine, Equality) {
 
     line_t line_invalid {4, 2, 3, 5, 0, nan<double>()};
     ASSERT_EQ(false, line_invalid.is_valid());
-    EXPECT_THROW(line_invalid == line1, std::logic_error);
-    EXPECT_THROW(line1 == line_invalid, std::logic_error);
-    EXPECT_THROW(line_invalid != line1, std::logic_error);
-    EXPECT_THROW(line1 != line_invalid, std::logic_error);
+    ASSERT_THROW(line_invalid == line1, std::logic_error);
+    ASSERT_THROW(line1 == line_invalid, std::logic_error);
+    ASSERT_THROW(line_invalid != line1, std::logic_error);
+    ASSERT_THROW(line1 != line_invalid, std::logic_error);
 }
 
 TEST_F(TestLine, Contains) {
@@ -202,7 +190,7 @@ TEST_F(TestLine, Contains) {
 
     line_t line_invalid {p1, vec_t {0, 0, 0}};
     ASSERT_EQ(false, line_invalid.is_valid());
-    EXPECT_THROW(line_invalid.contains(p1), std::logic_error);
+    ASSERT_THROW(line_invalid.contains(p1), std::logic_error);
 }
 
 
@@ -229,6 +217,6 @@ TEST_F(TestLine, ParallelLines) {
 
     line_t line_invalid {p1, p1};
     ASSERT_EQ(false, line_invalid.is_valid());
-    EXPECT_THROW(line_invalid.parallel_to(line1), std::logic_error);
-    EXPECT_THROW(line1.parallel_to(line_invalid), std::logic_error);
+    ASSERT_THROW(line_invalid.parallel_to(line1), std::logic_error);
+    ASSERT_THROW(line1.parallel_to(line_invalid), std::logic_error);
 }

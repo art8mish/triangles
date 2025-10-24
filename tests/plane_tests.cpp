@@ -17,6 +17,7 @@ protected:
     using point_t = typename triangles::Point<double>;
     using vec_t = typename triangles::Vector<double>;
     using plane_t = typename triangles::Plane<double>;
+    double eps_ = triangles::epsilon<double>();
 
     void SetUp() {};
     void TearDown() {};
@@ -62,7 +63,7 @@ TEST_F(TestPlane, InitInvalid) {
     ASSERT_EQ(true, plane_def_invalid.normal().is_valid());
     ASSERT_EQ(false, plane_def_invalid.normal().is_zero());
 
-    EXPECT_THROW((plane_t {p_valid1, p_valid2, p_invalid}), std::logic_error);
+    ASSERT_THROW((plane_t {p_valid1, p_valid2, p_invalid}), std::logic_error);
 }
 
 TEST_F(TestPlane, InitValid) {
@@ -74,14 +75,14 @@ TEST_F(TestPlane, InitValid) {
     ASSERT_EQ(true, plane1.is_valid());
     ASSERT_EQ(true, plane1.normal().is_valid());
     ASSERT_EQ(false, plane1.normal().is_zero());
-    ASSERT_EQ(false, plane1.normal().collinear_with(vec_t {0, 1, 0}));
+    ASSERT_EQ(true, plane1.normal().collinear_with(vec_t {0, 1, 0}));
 
     vec_t vec_valid {1, 2, 3};
     plane_t plane2 {p_zero, vec_valid};
     ASSERT_EQ(true, plane2.is_valid());
     ASSERT_EQ(true, plane2.normal().is_valid());
     ASSERT_EQ(false, plane2.normal().is_zero());
-    ASSERT_EQ(false, plane2.normal().collinear_with(vec_valid));
+    ASSERT_EQ(true, plane2.normal().collinear_with(vec_valid));
 }
 
 TEST_F(TestPlane, Equality) {
@@ -124,10 +125,10 @@ TEST_F(TestPlane, Equality) {
     point_t p_invalid {1, 2, nan<double>()};
     plane_t plane_invalid {p_invalid, vec_eq};
     ASSERT_EQ(false, plane_invalid.is_valid());
-    EXPECT_THROW(plane_main == plane_invalid, std::logic_error);
-    EXPECT_THROW(plane_invalid == plane_main, std::logic_error);
-    EXPECT_THROW(plane_main != plane_invalid, std::logic_error);
-    EXPECT_THROW(plane_invalid != plane_main, std::logic_error);
+    ASSERT_THROW(plane_main == plane_invalid, std::logic_error);
+    ASSERT_THROW(plane_invalid == plane_main, std::logic_error);
+    ASSERT_THROW(plane_main != plane_invalid, std::logic_error);
+    ASSERT_THROW(plane_invalid != plane_main, std::logic_error);
 }
 
 TEST_F(TestPlane, Contains) {
@@ -148,7 +149,7 @@ TEST_F(TestPlane, Contains) {
     vec_t vec_zero {};
     plane_t plane_invalid {p_zero, vec_zero};
     ASSERT_EQ(false, plane_invalid.is_valid());
-    EXPECT_THROW(plane_invalid.contains(p_zero), std::logic_error);
+    ASSERT_THROW(plane_invalid.contains(p_zero), std::logic_error);
 }
 
 TEST_F(TestPlane, ParallelPlanes) {
@@ -176,8 +177,49 @@ TEST_F(TestPlane, ParallelPlanes) {
     plane_t plane_invalid {p_zero, p1, point_t{2, 0, 0}};
     ASSERT_EQ(false, plane_invalid.is_valid());
 
-    EXPECT_THROW(plane_invalid.parallel_to(plane1), std::logic_error);
-    EXPECT_THROW(plane1.parallel_to(plane_invalid), std::logic_error);
-} 
+    ASSERT_THROW(plane_invalid.parallel_to(plane1), std::logic_error);
+    ASSERT_THROW(plane1.parallel_to(plane_invalid), std::logic_error);
+}
 
-// TODO: test signed distance and D()
+TEST_F(TestPlane, SignedDistance) {
+    point_t p_zero {};
+    point_t p1 {1, 0, 0};
+    point_t p2 {1, 0, 1};
+    plane_t plane {p_zero, p1, p2};
+    ASSERT_EQ(true, zero<double>(plane.signed_distance(p_zero), eps_));
+    ASSERT_EQ(true, zero<double>(plane.signed_distance(p1), eps_));
+    ASSERT_EQ(true, zero<double>(plane.signed_distance(p2), eps_));
+
+    ASSERT_EQ(true, zero<double>(plane.signed_distance(point_t {5, 0, 10}), eps_));
+    
+    double dist1 = plane.signed_distance(point_t {1, 2, 1});
+    double dist2 = plane.signed_distance(point_t {1, -2, 1});
+    ASSERT_EQ(true, equal<double>(std::abs(dist1), 2, eps_));
+    ASSERT_EQ(true, equal<double>(std::abs(dist2), 2, eps_));
+    ASSERT_EQ(true, equal<double>(dist1 * dist2, -4, eps_));
+
+    double dist3 = plane.signed_distance(point_t {1, -4, 1});
+    ASSERT_EQ(true, equal<double>(std::abs(dist3), 4, eps_));
+    ASSERT_EQ(true, equal<double>(dist3 * dist2, 8, eps_));
+
+    ASSERT_THROW(plane.signed_distance(point_t {1, -4, nan<double>()}), std::logic_error);
+
+    plane_t plane_invalid {p_zero, p1, point_t{2, 0, 0}};
+    ASSERT_EQ(false, plane_invalid.is_valid());
+    ASSERT_THROW(plane_invalid.signed_distance(p1), std::logic_error);
+}
+
+TEST_F(TestPlane, DCoefficient) {
+    point_t p1 {2, 0, 0};
+    point_t p2 {0, 2, 0};
+    point_t p3 {1, 1, 1};
+    plane_t plane {p1, p2, p3};
+
+    point_t p4 {1, 1, 5};
+    ASSERT_EQ(true, plane.contains(p4));
+    ASSERT_EQ(true, zero<double>(plane.normal().edot(vec_t {p4}) + plane.D(), eps_));
+
+    plane_t plane_invalid {p1, vec_t {1, 2, nan<double>()}};
+    ASSERT_EQ(false, plane_invalid.is_valid());
+    ASSERT_THROW(plane_invalid.D(), std::logic_error);
+}

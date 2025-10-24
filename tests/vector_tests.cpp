@@ -2,6 +2,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <fstream>
+#include <cmath>
 
 #include <point.hpp>
 #include <vector.hpp>
@@ -166,26 +167,38 @@ TEST_F(TestVector, Equality) {
     ASSERT_EQ(true, (vec_nums != vec_nums_neq) == (vec_nums_neq != vec_nums));
 }
 
+TEST_F(TestVector, Enorm) {
+    vec_t vec_zero {};
+    ASSERT_EQ(true, zero<double>(vec_zero.enorm(), eps_));
+
+    vec_t vec_valid {1, -2, 3};
+    ASSERT_EQ(true, equal<double>(vec_valid.enorm(), std::sqrt(14), eps_));
+
+    vec_t vec_invalid {1, 2, nan<double>()};
+    ASSERT_EQ(false, vec_invalid.is_valid());
+    ASSERT_THROW(vec_invalid.enorm(), std::logic_error);
+}
+
 TEST_F(TestVector, Edot) {
     vec_t vec_zero1 {};
     vec_t vec_zero2 {};
-    ASSERT_EQ(true, zero(vec_zero1.edot(vec_zero2), eps_));
+    ASSERT_EQ(true, zero<double>(vec_zero1.edot(vec_zero2), eps_));
 
     vec_t vec_main {1, -2, 3};
-    ASSERT_EQ(true,  zero(vec_main.edot(vec_zero1), eps_));
-    ASSERT_EQ(true,  zero(vec_zero1.edot(vec_main), eps_));
+    ASSERT_EQ(true,  zero<double>(vec_main.edot(vec_zero1), eps_));
+    ASSERT_EQ(true,  zero<double>(vec_zero1.edot(vec_main), eps_));
 
     vec_t vec1 {1, 2, 1};
-    ASSERT_EQ(true, zero(vec_main.edot(vec1), eps_));
-    ASSERT_EQ(true, zero(vec1.edot(vec_main), eps_));
+    ASSERT_EQ(true, zero<double>(vec_main.edot(vec1), eps_));
+    ASSERT_EQ(true, zero<double>(vec1.edot(vec_main), eps_));
 
     vec_t vec2 {3, 2, 1};
-    ASSERT_EQ(true, equal(vec_main.edot(vec2), 2.0, eps_));
-    ASSERT_EQ(true, equal(vec_main.edot(vec2), vec2.edot(vec_main), eps_));
+    ASSERT_EQ(true, equal<double>(vec_main.edot(vec2), 2.0, eps_));
+    ASSERT_EQ(true, equal<double>(vec_main.edot(vec2), vec2.edot(vec_main), eps_));
 
     vec_t vec3 {0, 0, 1};
-    ASSERT_EQ(true, equal(vec_main.edot(vec3), 3.0, eps_));
-    ASSERT_EQ(true, equal(vec_main.edot(vec3), vec3.edot(vec_main), eps_));
+    ASSERT_EQ(true, equal<double>(vec_main.edot(vec3), 3.0, eps_));
+    ASSERT_EQ(true, equal<double>(vec_main.edot(vec3), vec3.edot(vec_main), eps_));
 }
 
 TEST_F(TestVector, Ecross) {
@@ -257,6 +270,40 @@ TEST_F(TestVector, Orthogonality) {
     ASSERT_EQ(false, vec_not_orthogonal.orthogonal_to(vec_main));
 }
 
+TEST_F(TestVector, Normalization) {
+    vec_t vec_normalized1 {2.0/7, 3.0/7, 6.0/7};
+    ASSERT_EQ(true, vec_normalized1.is_normalized());
+    vec_t vec_normalized2 {0, 1, 0};
+    ASSERT_EQ(true, vec_normalized2.is_normalized());
+
+    vec_t vec_invalid {1, 2, nan<double>()};
+    ASSERT_EQ(false, vec_invalid.is_valid());
+    ASSERT_THROW(vec_invalid.is_normalized(), std::logic_error);
+
+    vec_t vec_zero {};
+    std::cout << vec_zero.to_string() << "\n";
+    ASSERT_EQ(true, vec_zero.is_zero());
+    ASSERT_EQ(false, vec_zero.is_normalized());
+
+    vec_t vec_main {2, 6, -3};
+    ASSERT_EQ(false, vec_main.is_normalized());
+    ASSERT_EQ(true, equal<double>(vec_main.enorm(), 7, eps_));
+
+    vec_main.normalize();
+    ASSERT_EQ(true, vec_main.collinear_with(vec_t {2, 6, -3}));
+    ASSERT_EQ(true, equal<double>(vec_main.edot(vec_main), 1, eps_));
+    ASSERT_EQ(true, equal<double>(vec_main.x(), 2.0/7, eps_));
+    ASSERT_EQ(true, equal<double>(vec_main.y(), 6.0/7, eps_));
+    ASSERT_EQ(true, equal<double>(vec_main.z(), -3.0/7, eps_));
+    ASSERT_EQ(true, vec_main.is_normalized());
+    
+    vec_t vec_rval = (vec_t {1, 2, 3}).normalize();
+    ASSERT_EQ(true, vec_rval.is_normalized());
+
+    ASSERT_THROW(vec_invalid.normalize(), std::logic_error);
+    ASSERT_NO_THROW(vec_zero.normalize());
+}
+
 TEST_F(TestVector, GetPerpendicular) {
     vec_t vec_zero {};
     ASSERT_EQ(true, vec_zero.get_perpendicular().is_zero());
@@ -286,27 +333,33 @@ TEST_F(TestVector, InvalidStateExceptions) {
     vec_t vec_invalid {1, 2, nan<double>()};
     ASSERT_EQ(false, vec_invalid.is_valid());
 
-    EXPECT_THROW(vec_invalid.is_zero(), std::logic_error);
-    EXPECT_THROW(vec_invalid.get_perpendicular(), std::logic_error);
+    ASSERT_THROW(vec_invalid.is_zero(), std::logic_error);
+    
+    ASSERT_THROW(vec_invalid.x(), std::logic_error);
+    ASSERT_THROW(vec_invalid.y(), std::logic_error);
+    ASSERT_THROW(vec_invalid.z(), std::logic_error);
+
+    ASSERT_THROW(vec_invalid.normalize(), std::logic_error);
+    ASSERT_THROW(vec_invalid.get_perpendicular(), std::logic_error);
 
     vec_t vec_valid {1, 2, 3};
     ASSERT_EQ(true, vec_valid.is_valid());
 
-    EXPECT_THROW(vec_valid == vec_invalid, std::logic_error);
-    EXPECT_THROW(vec_invalid == vec_valid, std::logic_error);
+    ASSERT_THROW(vec_valid == vec_invalid, std::logic_error);
+    ASSERT_THROW(vec_invalid == vec_valid, std::logic_error);
 
-    EXPECT_THROW(vec_valid != vec_invalid, std::logic_error);
-    EXPECT_THROW(vec_invalid != vec_valid, std::logic_error);
+    ASSERT_THROW(vec_valid != vec_invalid, std::logic_error);
+    ASSERT_THROW(vec_invalid != vec_valid, std::logic_error);
 
-    EXPECT_THROW(vec_valid.edot(vec_invalid), std::logic_error);
-    EXPECT_THROW(vec_invalid.edot(vec_valid), std::logic_error);
+    ASSERT_THROW(vec_valid.edot(vec_invalid), std::logic_error);
+    ASSERT_THROW(vec_invalid.edot(vec_valid), std::logic_error);
 
-    EXPECT_THROW(vec_valid.ecross(vec_invalid), std::logic_error);
-    EXPECT_THROW(vec_invalid.ecross(vec_valid), std::logic_error);
+    ASSERT_THROW(vec_valid.ecross(vec_invalid), std::logic_error);
+    ASSERT_THROW(vec_invalid.ecross(vec_valid), std::logic_error);
 
-    EXPECT_THROW(vec_valid.collinear_with(vec_invalid), std::logic_error);
-    EXPECT_THROW(vec_invalid.collinear_with(vec_valid), std::logic_error);
+    ASSERT_THROW(vec_valid.collinear_with(vec_invalid), std::logic_error);
+    ASSERT_THROW(vec_invalid.collinear_with(vec_valid), std::logic_error);
 
-    EXPECT_THROW(vec_valid.orthogonal_to(vec_invalid), std::logic_error);
-    EXPECT_THROW(vec_invalid.orthogonal_to(vec_valid), std::logic_error);
+    ASSERT_THROW(vec_valid.orthogonal_to(vec_invalid), std::logic_error);
+    ASSERT_THROW(vec_invalid.orthogonal_to(vec_valid), std::logic_error);
 }

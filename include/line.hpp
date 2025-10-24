@@ -84,10 +84,12 @@ public:
     }
 
     const Vector<T> &direction() const & {
+        check_validity();
         return d_;
     }
 
     const Point<T> &point() const & {
+        check_validity();
         return p_;
     }
 

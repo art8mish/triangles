@@ -27,6 +27,8 @@ template <std::floating_point T> class Vector {
             throw std::logic_error(to_string() + " is not valid");
     }
 
+
+
 public:
     Vector(const T &dx, const T &dy, const T &dz) : dx_{dx}, dy_{dy}, dz_{dz} {
         validate();
@@ -49,12 +51,15 @@ public:
     }
 
     const T &x() const & {
+        check_validity();
         return dx_;
     }
     const T &y() const & {
+        check_validity();
         return dy_;
     }
     const T &z() const & {
+        check_validity();
         return dz_;
     }
 
@@ -78,11 +83,24 @@ public:
                zero<T>(dz_, eps_);
     }
 
+    bool is_normalized() const {
+        check_validity();
+        return equal<T>(dx_*dx_ + dy_*dy_ + dz_*dz_, 1, eps_);
+    }
+
+    T enorm() const {
+        check_validity();
+        return std::sqrt(edot(*this));
+    }
+
+
     T edot(const Vector<T> &other) const {
         check_validity();
         other.check_validity();
         return dx_ * other.dx_ + dy_ * other.dy_ + dz_ * other.dz_;
     }
+
+    
 
     Vector<T> ecross(const Vector<T> &other) const {
         check_validity();
@@ -92,6 +110,7 @@ public:
                          dx_ * other.dy_ - dy_ * other.dx_};
     }
 
+    
     bool collinear_with(const Vector<T> &other) const {
         check_validity();
         other.check_validity();
@@ -110,6 +129,31 @@ public:
 
         return zero<T>(edot(other), eps_);
     }
+    
+    Vector<T>& normalize() & {
+        check_validity();
+        T norm = enorm();
+        if (zero<T>(norm, eps_) || equal<T>(norm, 1, eps_))
+            return *this;
+            
+        assert(zero<T>(norm, eps_) == false);
+        dx_ = dx_ / norm;
+        dy_ = dy_ / norm;
+        dz_ = dz_ / norm;
+
+        return *this;
+    }
+
+    Vector<T> normalize() && {
+        check_validity();
+        T norm = enorm();
+        if (zero<T>(norm, eps_) || equal<T>(norm, 1, eps_))
+            return Vector<T> {*this};
+        
+        assert(zero<T>(norm, eps_) == false);
+        return Vector<T> {dx_ / norm, dy_ / norm, dz_ / norm};
+    }
+
 
     Vector<T> get_perpendicular() {
         check_validity();
