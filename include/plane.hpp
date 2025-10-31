@@ -83,6 +83,14 @@ public:
         return n_.collinear_with(other.n_);
     }
 
+    std::pair<Vector<T>, Vector<T>> get_basis_vectors() {
+        check_validity();
+
+        Vector<T> u = n_.get_perpendicular();
+        Vector<T> v = n_.ecross(u);
+        return std::pair<Vector<T>, Vector<T>>{u, v};
+    }
+
     std::string to_string() const {
         return "Plane((" + n_.to_string() + ", (x, y, z) -" +
                p_.to_string() + ") = 0";

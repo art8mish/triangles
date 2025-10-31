@@ -87,10 +87,19 @@ public:
         check_validity();
         return d_;
     }
-
+    
     const Point<T> &point() const & {
         check_validity();
         return p_;
+    }
+
+    Point<T> get_point(T t) {
+        check_validity();
+        return Point<T> {
+            p_.x + d_.dx_ * t,  
+            p_.y + d_.dy_ * t,
+            p_.z + d_.dz_ * t
+        };
     }
 
     bool operator==(const Line<T> &other) const {

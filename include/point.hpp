@@ -30,6 +30,10 @@ public:
             throw std::logic_error(to_string() + " is not valid");
     }
 
+    static Point<T> get_invalid() const {
+        return Point<T> {nan<T>(), nan<T>(), nan<T>()};
+    }
+
     bool is_zero() const {
         check_validity();
 

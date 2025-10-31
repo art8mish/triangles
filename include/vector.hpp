@@ -100,7 +100,11 @@ public:
         return dx_ * other.dx_ + dy_ * other.dy_ + dz_ * other.dz_;
     }
 
-    
+    // T edot(const Point<T> &point) const {
+    //     check_validity();
+    //     point.check_validity();
+    //     return dx_ * point.x_ + dy_ * point.y_ + dz_ * point.z_;
+    // }
 
     Vector<T> ecross(const Vector<T> &other) const {
         check_validity();
@@ -109,7 +113,6 @@ public:
                          dz_ * other.dx_ - dx_ * other.dz_,
                          dx_ * other.dy_ - dy_ * other.dx_};
     }
-
     
     bool collinear_with(const Vector<T> &other) const {
         check_validity();
