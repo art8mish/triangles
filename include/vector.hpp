@@ -76,12 +76,25 @@ public:
         return !(*this == rhs);
     }
 
+    // Vector<T> operator +(const Vector<T> &rhs) const {
+    //     check_validity();
+    //     rhs.check_validity();
+
+    //     return Vector<T>{dx_ + rhs.dx_, dy_ + rhs.dy_, dz_ + rhs.dz_}
+    // }
+
     bool is_zero() const {
         check_validity();
 
         return zero<T>(dx_, eps_) && zero<T>(dy_, eps_) &&
                zero<T>(dz_, eps_);
     }
+
+    // bool is_zero() const {
+    //     check_validity();
+
+    //     return zero<T>(dx_ * dx_ + dy_ * dy_ + dz_ * dz_, eps_ * eps_);
+    // }
 
     bool is_normalized() const {
         check_validity();

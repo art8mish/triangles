@@ -219,8 +219,9 @@ template <std::floating_point T> class Triangle {
         return segments_intersect_(this_a, this_b, other_a, other_b)
     }
 
+    // barycentric coordinates
     bool triangle_point_intersection_(const Point<T> &point) const {
-        assert(kind_ == Kind::TRIANLE);
+        assert(kind_ == Kind::TRIANGLE);
 
         Plane<T> plane = get_plane();
         assert(plane.is_valid());
@@ -228,17 +229,33 @@ template <std::floating_point T> class Triangle {
         if (!plane.contains(point))
             return false;
 
-        const auto [u, v] = plane.get_basis_vectors();
-        Triangle<T> this_2d = to_2d(u, v, plane.point());
-        
-        const auto normals = this_2d.get_2d_normals_();
-        for (auto &n : normals) {
-            const auto [a, b] = this_2d.get_projection_segment_(n);
-            T proj = projection(n, point); // POINT TO 2D
-            if ((proj < a) || (proj > b))
-                return false;
-        }
-        return true;
+        // vec(P) = vec(p1) + a * vec(p1, p2) + b * vec(p1, p3) 
+        // |_w                    |_u               |_v
+        // a >= 0, b >= 0, a + b <= 1
+        Vector<T> u = Vector<T>{p1_, p2_};
+        Vector<T> v = Vector<T>{p1_, p3_};
+        Vector<T> w = Vector<T>{p1_, point};
+
+        // solve system:
+        // { (w, v) = a * (u, v) + b * (v, v) | (wv = a * uv + b * vv)
+        // { (w, u) = a * (u, u) + b * (v, u) | (wu = a * uu + b * uv)
+
+        T uu = u.edot(u);
+        T uv = u.edot(v);
+        T vv = v.edot(v);
+        T wu = w.edot(u);
+        T wv = w.edot(v);
+
+        T det = uu * vv - uv * uv;
+        assert(!zero(det, eps_));
+        T rev_det = 1 / det;
+
+        T a = (wu * vv - wv * uv) * rev_det;
+        T b = (wv * uu - wu * uv) * rev_det;
+        T c = 1 - a - b;
+        return (zero(a, eps_) || a > 0) 
+            && (zero(b, eps_) || b > 0) 
+            && (zero(c, eps_) || c > 0);
     }
 
 
@@ -287,9 +304,8 @@ template <std::floating_point T> class Triangle {
         return (p1_ != p2_) ? Line<T>{p1_, p2_} : Line<T>{p1_, p3_};
     }
 
-
     // rule: plane and line is not parallel
-    Point<T> plane_line_intersection_point_(const Plane<T> plane, Line<T> &line) {
+    static Point<T> plane_line_intersection_point_(const Plane<T> plane, Line<T> &line) {
         const Vector<T> &n = plane.normal();
         const Vector<T> &d = line.direction();
 
@@ -308,9 +324,57 @@ template <std::floating_point T> class Triangle {
 
         const auto [a, b] = get_projection_segment_(line.direction());
         T proj = projection(axis, point);
-        if ((proj < a) || (proj > b))
+        return proj > (a - eps_) && proj < (b + eps_);
+    }
+
+    bool segment_segment_intersection_(const Triangle<T> &other) const {
+        assert(kind_ == Kind::SEGMENT);
+        assert(other.kind_ == Kind::SEGMENT);
+
+        const Line<T> line1 = to_line();
+        const Vector<T> &d1 = line1.direction();
+
+        const Line<T> line2 = other.to_line();
+        const Vector<T> &d2 = line2.direction();
+
+        if (d1.is_parallel(d2))
+            return line1.contains(line2.point());
+
+        const Vector<T> point_vec {this_line.point(), other_line.point()};
+
+        const T scalar_triple_prod = d1.edot(d2.ecross(point_vec));
+        if (!zero(scalar_triple_prod, eps_))
+            return false
+
+        // L1: q1 = vec(p1) + t1 * d1
+        // L2: q2 = vec(p2) + t2 * d2
+        // minimizing distance vector d = q2 - q1 = vec(p1, p2) + t2 * d2 - t1 * d1
+        // (d, d1) = 0 && (d, d2) = 0 (minimum d is perpendicular to d1 and d2)
+        // solve system (u = point_vec = vec(p1, p2))
+        // { (u, d1) = t1 * (d1, d1) - t2 * (d1, d2) | u1 = t1 * d11 - t2 * d12
+        // { (u, d2) = t1 * (d1, d2) - t2 * (d2, d2) | u2 = t1 * d12 - t2 * d22
+
+        T u1 = point_vec.edot(d1);
+        T u2 = point_vec.edot(d2);
+        T d11 = d1.edot(d1);
+        T d22 = d2.edot(d2);
+        T d12 = d1.edot(d2);
+
+        T det = d11 * d22 - d12 * d12;
+        assert(!zero(det, eps_))
+        T t1 = (u1 * d22 - u2 * d12) / det;
+        T t2 = (u1 * d12 - u2 * d11) / det;
+
+        const Point<T> q1 = line1.get_point(t1);
+        if (!segment_point_intersection_(q1))
             return false;
-        return true;
+
+        const Point<T> q2 = line2.get_point(t2);
+        if (!other.segment_point_intersection_(q2))
+            return false;
+
+        const Vector<T> d {q1, q2};
+        return d.is_zero();
     }
 
 public:
@@ -339,24 +403,30 @@ public:
 
         if (kind_ == Kind::POINT) {
             if (other.kind_ == Kind::POINT)
-                return p1_ == other.p1_;
+                return other.p1_ == p1_;
     
             else if (other.kind_ == Kind::SEGMENT)
-                return 
+                return other.segment_point_intersection_(p1_);
 
-            return other.triangle_point_intersection_(p1_)
+            return other.triangle_point_intersection_(p1_);
         }
 
-        else if (kind__ == Kind::SEGMENT) {
-            if (other.kind_ == Kind::POINT) {
+        else if (kind_ == Kind::SEGMENT) {
+            if (other.kind_ == Kind::POINT)
+                return segment_point_intersection_(other.p1_);
 
-            }
-            else if (other.kind__ == Kind::SEGMENT) {
+            else if (other.kind__ == Kind::SEGMENT)
+                return segment_segment_intersection_(other.p1_);
 
-            }
-
-            return
+            return other.triangle_segment_intersection_(*this);
         }
+
+        // triangle
+        if (other.kind_ == Kind::POINT)
+            return other.triangle_point_intersection_(other.p1_);
+    
+        else if (other.kind__ == Kind::SEGMENT)
+            triangle_segment_intersection_(other);
 
         return triangle_triangle_intersection_(other);    
     }
