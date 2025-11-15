@@ -22,29 +22,29 @@ template <std::floating_point T> class Triangle {
     Point<T> p3_{};
     T eps_{epsilon<T>()};
 
+public:
     enum class Kind {
-        TRIANLE,
+        TRIANGLE,
         SEGMENT, // one point is lying between two another (or
                  // two equal), after validation:
                  // line_ should be initialized
         POINT,   // three points are equal
         INVALID  // point is invalid
     };
+private:
+    Kind kind_ {Kind::INVALID};
 
-    Kind kind_{Kind::INVALID};
-
-    void validate() const {
-        if (!p1_.is_valid() || !p2_.is_valid() || !p3_.is_valid()) {
+    void validate() {
+        if (!p1_.is_valid() || !p2_.is_valid() || !p3_.is_valid())
             kind_ = Kind::INVALID;
-            return;
-        }
 
-        if (p1_ == p2_) {
+        else if (p1_ == p2_) {
             if (p2_ == p3_)
                 kind_ = Kind::POINT;
             else
                 kind_ = Kind::SEGMENT;
         }
+
         else {
             Line side{p1_, p2_};
             if (side.contains(p3_))
@@ -68,37 +68,40 @@ template <std::floating_point T> class Triangle {
         };
     }
 
-    T projection (const Vector<T>& axis, const Point<T>& point) {
+    static T projection (const Vector<T>& axis, const Point<T>& point) {
         return axis.edot(Vector<T> {point});
     }
 
-    std::pair<T, T> get_projection_segment_ (const Vector<T>& axis) {
+    std::pair<T, T> get_projection_segment_ (const Vector<T>& axis) const {
         T proj1 = projection(axis, p1_);
         T proj2 = projection(axis, p2_);
         T proj3 = projection(axis, p3_);
 
         return std::pair<T, T> {
             std::min({proj1, proj2, proj3}), 
-            std::max({proj1, proj2, proj3});
+            std::max({proj1, proj2, proj3})
         };
     }
 
-    static bool segments_intersect_(T segment1_a, T segment1_b, T segment2_a, T segment2_b) const {
+    static bool segments_intersect_(T segment1_a, T segment1_b, T segment2_a, T segment2_b) {
         const T max_a = std::max(segment1_a, segment2_a);
         const T min_b = std::min(segment1_b, segment2_b);
 
-        return (max_a < min_b) || equal<T>(max_a, min_b, eps_);
+        return max_a < min_b + epsilon<T>();
+    }
+
+    bool projections_intersect_(const Triangle<T> &other, const Vector<T> &axis) const {
+        const auto [this_a, this_b] = get_projection_segment_(axis);
+        const auto [other_a, other_b] = other.get_projection_segment_(axis);
+        return segments_intersect_(this_a, this_b, other_a, other_b);
     }
 
     // rule: this and other should be in 2d and lie on same plane
     bool triangle_normal_proj_intersection_2d_(const Triangle<T> &other) const {
         const auto normals =  get_2d_normals_();
-        for (auto &n : normals) {
-            const auto [this_a, this_b] = get_projection_segment_(n);
-            const auto [other_a, other_b] = other.get_projection_segment_(n);
-            if (!segments_intersect_(this_a, this_b, other_a, other_b))
+        for (auto &n : normals)
+            if (!projections_intersect_(other, n))
                 return false;
-        }
         return true;
     }
 
@@ -122,7 +125,7 @@ template <std::floating_point T> class Triangle {
         return true;
     }
 
-    Triangle<T> to_2d_(const Vector<T> &u, const Vector<T> &v, const Point<T> &p) {
+    Triangle<T> to_2d_(const Vector<T> &u, const Vector<T> &v, const Point<T> &p) const {
         return Triangle <T>{
             Point<T> {
                 u.edot(Vector<T> {p, p1_}),
@@ -158,7 +161,7 @@ template <std::floating_point T> class Triangle {
     // return t for line equation p + vec(d) * t of Line(p2, p1) intersection point
     T line_intersection_point_(const Line<T> &line,
                                const Point<T> &p1, const T &sdist1,
-                               const Point<T> &p2, const T &sdist2) {
+                               const Point<T> &p2, const T &sdist2) const {
 
         const Vector<T> &line_dir = line.direction();
         const Point<T> &line_p = line.point();
@@ -193,7 +196,7 @@ template <std::floating_point T> class Triangle {
     }
 
     bool triangle_triangle_intersection_(const Triangle<T> &other) const {
-        assert(kind_ == Kind::TRIANLE && other.kind_ == Kind::TRIANLE);
+        assert(kind_ == Kind::TRIANGLE && other.kind_ == Kind::TRIANGLE);
 
         const Plane<T> this_plane = get_plane();
         assert(this_plane.is_valid());
@@ -216,7 +219,7 @@ template <std::floating_point T> class Triangle {
         const auto [this_a, this_b] = triangle_line_intersection_segment_(common_line, other_plane);
         const auto [other_a, other_b] = other.triangle_line_intersection_segment_(common_line, this_plane);
 
-        return segments_intersect_(this_a, this_b, other_a, other_b)
+        return segments_intersect_(this_a, this_b, other_a, other_b);
     }
 
     // barycentric coordinates
@@ -261,7 +264,7 @@ template <std::floating_point T> class Triangle {
 
     //rule: triangle and segment is lying on same plane
     bool triangle_segment_intersection_2d_(const Triangle<T> &other) const {
-        assert(kind_ == Kind::TRIANLE && other.kind_ == Kind::SEGMENT);
+        assert(kind_ == Kind::TRIANGLE && other.kind_ == Kind::SEGMENT);
 
         Plane<T> plane = get_plane();
         const auto [u, v] = plane.get_basis_vectors();
@@ -282,7 +285,6 @@ template <std::floating_point T> class Triangle {
         assert(plane.is_valid());
 
         const Line<T> line = other.to_line();
-        const Vector<T> &d = line.direction();
 
         assert(line.is_valid());
         if (plane.normal().orthogonal_to(line.direction())) {
@@ -291,7 +293,9 @@ template <std::floating_point T> class Triangle {
 
             return triangle_segment_intersection_2d_(other);
         }
-        Point<T> intersection_p = plane_line_intersection_point_(plane, line);
+        
+        Point<T> intersection_p = plane_line_intersection_point(plane, line);
+        std::cout << "Intersec point: " + intersection_p.to_string() + '\n';
         if (!other.segment_point_intersection_(intersection_p))
             return false;
 
@@ -303,16 +307,7 @@ template <std::floating_point T> class Triangle {
         assert(kind_ == Kind::SEGMENT);
         return (p1_ != p2_) ? Line<T>{p1_, p2_} : Line<T>{p1_, p3_};
     }
-
-    // rule: plane and line is not parallel
-    static Point<T> plane_line_intersection_point_(const Plane<T> plane, Line<T> &line) {
-        const Vector<T> &n = plane.normal();
-        const Vector<T> &d = line.direction();
-
-        assert(!n.orthogonal_to(d));
-        T t = n.edot(Vector<T> {plane.point(), line.point()}) / n.edot(d);
-        return line.get_point(t);
-    }
+    
 
 
     bool segment_point_intersection_(const Point<T> &point) const {
@@ -322,7 +317,8 @@ template <std::floating_point T> class Triangle {
         if (!line.contains(point))
             return false;
 
-        const auto [a, b] = get_projection_segment_(line.direction());
+        const Vector<T> &axis = line.direction();
+        const auto [a, b] = get_projection_segment_(axis);
         T proj = projection(axis, point);
         return proj > (a - eps_) && proj < (b + eps_);
     }
@@ -337,14 +333,17 @@ template <std::floating_point T> class Triangle {
         const Line<T> line2 = other.to_line();
         const Vector<T> &d2 = line2.direction();
 
-        if (d1.is_parallel(d2))
-            return line1.contains(line2.point());
+        if (d1.collinear_with(d2)) {
+            if (!line1.contains(line2.point()))
+                return false;
+            return projections_intersect_(other, d1);
+        }
 
-        const Vector<T> point_vec {this_line.point(), other_line.point()};
+        const Vector<T> point_vec {line1.point(), line2.point()};
 
         const T scalar_triple_prod = d1.edot(d2.ecross(point_vec));
         if (!zero(scalar_triple_prod, eps_))
-            return false
+            return false;
 
         // L1: q1 = vec(p1) + t1 * d1
         // L2: q2 = vec(p2) + t2 * d2
@@ -361,7 +360,7 @@ template <std::floating_point T> class Triangle {
         T d12 = d1.edot(d2);
 
         T det = d11 * d22 - d12 * d12;
-        assert(!zero(det, eps_))
+        assert(!zero(det, eps_));
         T t1 = (u1 * d22 - u2 * d12) / det;
         T t2 = (u1 * d12 - u2 * d11) / det;
 
@@ -396,6 +395,10 @@ public:
         return kind_ != Kind::INVALID;
     }
 
+    Kind type() const {
+        return kind_;
+    }
+
 
     bool intersects(const Triangle<T> &other) const {
         check_validity();
@@ -415,20 +418,40 @@ public:
             if (other.kind_ == Kind::POINT)
                 return segment_point_intersection_(other.p1_);
 
-            else if (other.kind__ == Kind::SEGMENT)
-                return segment_segment_intersection_(other.p1_);
+            else if (other.kind_ == Kind::SEGMENT)
+                return segment_segment_intersection_(other);
 
             return other.triangle_segment_intersection_(*this);
         }
 
         // triangle
         if (other.kind_ == Kind::POINT)
-            return other.triangle_point_intersection_(other.p1_);
+            return triangle_point_intersection_(other.p1_);
     
-        else if (other.kind__ == Kind::SEGMENT)
-            triangle_segment_intersection_(other);
+        else if (other.kind_ == Kind::SEGMENT)
+            return triangle_segment_intersection_(other);
 
         return triangle_triangle_intersection_(other);    
+    }
+
+    static Point<T> plane_line_intersection_point(const Plane<T> &plane, const Line<T> &line) {
+        const Vector<T> &n = plane.normal();
+        const Vector<T> &d = line.direction();
+
+        if (n.orthogonal_to(d)) {
+            if (plane.contains(line.point()))
+                return Point<T>::get_infinitive();
+            return Point<T>::get_invalid();
+        }   
+
+        Point<T> line_p {line.point()};
+        if (line_p == plane.point())
+            line_p = line.get_point(1);
+
+        const Vector<T> v = Vector<T>{line_p, plane.point()};
+        ///...
+        T t = n.edot(v) / n.edot(d);
+        return line.get_point(t);
     }
     
 

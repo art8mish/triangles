@@ -30,17 +30,17 @@ template <std::floating_point T> class Vector {
 
 
 public:
-    Vector(const T &dx, const T &dy, const T &dz) : dx_{dx}, dy_{dy}, dz_{dz} {
+    Vector(T dx, T dy, T dz) : dx_{dx}, dy_{dy}, dz_{dz} {
         validate();
     }
-    Vector(const T &dx, const T &dy) : Vector(dx, dy, 0) {}
-    Vector(const T &dx) : Vector(dx, 0, 0) {}
+    Vector(T dx, T dy) : Vector(dx, dy, 0) {}
+    explicit Vector(T dx) : Vector(dx, 0, 0) {}
     Vector() : Vector(0, 0, 0) {}
 
     Vector(const Point<T> &p) : Vector(p.x, p.y, p.z) {}
 
-    Vector(const T &from_x, const T &from_y, const T &from_z,
-           const T &to_x,   const T &to_y,   const T &to_z)
+    Vector(T from_x, T from_y, T from_z,
+           T to_x,  T to_y,   T to_z)
         : Vector(to_x - from_x, to_y - from_y, to_z - from_z) {}
 
     Vector(const Point<T> &from, const Point<T> &to)
@@ -75,13 +75,6 @@ public:
     bool operator!=(const Vector<T> &rhs) const {
         return !(*this == rhs);
     }
-
-    // Vector<T> operator +(const Vector<T> &rhs) const {
-    //     check_validity();
-    //     rhs.check_validity();
-
-    //     return Vector<T>{dx_ + rhs.dx_, dy_ + rhs.dy_, dz_ + rhs.dz_}
-    // }
 
     bool is_zero() const {
         check_validity();
@@ -160,7 +153,7 @@ public:
         return *this;
     }
 
-    Vector<T> normalize() && {
+    Vector<T> normalize() const && {
         check_validity();
         T norm = enorm();
         if (zero<T>(norm, eps_) || equal<T>(norm, 1, eps_))
@@ -171,7 +164,7 @@ public:
     }
 
 
-    Vector<T> get_perpendicular() {
+    Vector<T> get_perpendicular() const {
         check_validity();
         if (is_zero())
             return Vector<T> {};

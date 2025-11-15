@@ -17,9 +17,9 @@ public:
     T z {0};
 
     Point() = default;
-    Point(const T &x, const T &y, const T &z) : x{x}, y{y}, z{z} {}
-    Point(const T &x, const T &y) : Point(x, y, 0) {}
-    Point(const T &x) : Point(x, 0, 0) {}
+    Point(T x, T y, T z) : x{x}, y{y}, z{z} {}
+    Point(T x, T y) : Point(x, y, 0) {}
+    Point(T x) : Point(x, 0, 0) {}
 
     bool is_valid() const {
         return valid(x) && valid(y) && valid(z);
@@ -30,8 +30,12 @@ public:
             throw std::logic_error(to_string() + " is not valid");
     }
 
-    static Point<T> get_invalid() const {
+    static Point<T> get_invalid() {
         return Point<T> {nan<T>(), nan<T>(), nan<T>()};
+    }
+
+    static Point<T> get_infinitive() {
+        return Point<T> {inf<T>(), inf<T>(), inf<T>()};
     }
 
     bool is_zero() const {

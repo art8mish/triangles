@@ -43,6 +43,10 @@ public:
         return n_;
     }
 
+    const Point<T>& point() const & {
+        return p_;
+    }
+
     bool operator==(const Plane<T> &rhs) const {
         check_validity();
         rhs.check_validity();
@@ -83,7 +87,7 @@ public:
         return n_.collinear_with(other.n_);
     }
 
-    std::pair<Vector<T>, Vector<T>> get_basis_vectors() {
+    std::pair<Vector<T>, Vector<T>> get_basis_vectors() const {
         check_validity();
 
         Vector<T> u = n_.get_perpendicular();

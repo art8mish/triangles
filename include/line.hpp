@@ -31,8 +31,7 @@ template <std::floating_point T> class Line {
     }
 
 public:
-    Line(const T &x1, const T &y1, const T &z1, const T &x2,
-         const T &y2, const T &z2)
+    Line(T x1, T y1, T z1, T x2, T y2, T z2)
         : p_{x1, y1, z1}, d_{x1, y1, z1, x2, y2, z2} {
         validate();
     }
@@ -93,12 +92,12 @@ public:
         return p_;
     }
 
-    Point<T> get_point(T t) {
+    Point<T> get_point(T t) const {
         check_validity();
         return Point<T> {
-            p_.x + d_.dx_ * t,  
-            p_.y + d_.dy_ * t,
-            p_.z + d_.dz_ * t
+            p_.x + d_.x() * t,  
+            p_.y + d_.y() * t,
+            p_.z + d_.z() * t
         };
     }
 

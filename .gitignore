@@ -1,3 +1,5 @@
-.vscode
-build
-logs
+.vscode/
+build/
+logs/
+.venv/
+dev.ipynb

@@ -3,6 +3,7 @@
 #include <concepts>
 #include <type_traits>
 #include <utility>
+#include <limits>
 
 namespace triangles {
 const char *LOG_PATH = "logs/triangles.log";
@@ -18,6 +19,10 @@ template <std::floating_point T> T epsilon() {
 
 template <std::floating_point T> T nan() {
     return std::numeric_limits<T>::quiet_NaN();
+}
+
+template <std::floating_point T> T inf() {
+    return std::numeric_limits<T>::infinity();
 }
 
 // template <std::floating_point T = double> T get_zero() {
