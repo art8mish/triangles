@@ -33,17 +33,18 @@ public:
     }
 
     Plane(const Point<T> &p1, const Point<T> &p2, const Point<T> &p3)
-        : Plane(p1, Vector<T>{p1, p2}.ecross(Vector<T>{p1, p3}).normalize()) {}
+        : Plane(p1, Vector<T>{p1, p2}.ecross(Vector<T>{p1, p3}).normalize()) {
+    }
 
     bool is_valid() const {
         return validity_;
     }
 
-    const Vector<T>& normal() const & {
+    const Vector<T> &normal() const & {
         return n_;
     }
 
-    const Point<T>& point() const & {
+    const Point<T> &point() const & {
         return p_;
     }
 
@@ -96,8 +97,8 @@ public:
     }
 
     std::string to_string() const {
-        return "Plane((" + n_.to_string() + ", (x, y, z) -" +
-               p_.to_string() + ") = 0";
+        return "Plane((" + n_.to_string() + ", (x, y, z) -" + p_.to_string() +
+               ") = 0";
     }
 };
 } // namespace triangles

@@ -1,7 +1,7 @@
 
 #include "../include/triangles.hpp"
+#include <ctime>
 #include <vector>
-#include <ctime> 
 
 int main() {
     // unsigned triangles_amount = 0;
@@ -26,11 +26,9 @@ int main() {
     // for (unsigned& key : keys)
     //     cache.proc_page(key);
 
-
-    
     // std::cout <<  cache.hits() << std::endl;
     // //std::cout << "runtime = " << std::clock()/1000.0 << std::endl;
-    
+
     // #ifdef DEBUG
     // auto duration = std::clock() - start_time;
     // std::cout << "runtime: " << duration << " us" << std::endl;

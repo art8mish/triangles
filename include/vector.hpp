@@ -12,9 +12,9 @@ namespace triangles {
 template <std::floating_point T> class Vector {
     T eps_{epsilon<T>()};
 
-    T dx_ {0};
-    T dy_ {0};
-    T dz_ {0};
+    T dx_{0};
+    T dy_{0};
+    T dz_{0};
 
     bool validity_{false};
     void validate() {
@@ -27,24 +27,27 @@ template <std::floating_point T> class Vector {
             throw std::logic_error(to_string() + " is not valid");
     }
 
-
-
 public:
     Vector(T dx, T dy, T dz) : dx_{dx}, dy_{dy}, dz_{dz} {
         validate();
     }
-    Vector(T dx, T dy) : Vector(dx, dy, 0) {}
-    explicit Vector(T dx) : Vector(dx, 0, 0) {}
-    Vector() : Vector(0, 0, 0) {}
+    Vector(T dx, T dy) : Vector(dx, dy, 0) {
+    }
+    explicit Vector(T dx) : Vector(dx, 0, 0) {
+    }
+    Vector() : Vector(0, 0, 0) {
+    }
 
-    Vector(const Point<T> &p) : Vector(p.x, p.y, p.z) {}
+    Vector(const Point<T> &p) : Vector(p.x, p.y, p.z) {
+    }
 
-    Vector(T from_x, T from_y, T from_z,
-           T to_x,  T to_y,   T to_z)
-        : Vector(to_x - from_x, to_y - from_y, to_z - from_z) {}
+    Vector(T from_x, T from_y, T from_z, T to_x, T to_y, T to_z)
+        : Vector(to_x - from_x, to_y - from_y, to_z - from_z) {
+    }
 
     Vector(const Point<T> &from, const Point<T> &to)
-        : Vector(from.x, from.y, from.z, to.x, to.y, to.z) {}
+        : Vector(from.x, from.y, from.z, to.x, to.y, to.z) {
+    }
 
     bool is_valid() const {
         return validity_;
@@ -67,8 +70,7 @@ public:
         check_validity();
         rhs.check_validity();
 
-        return equal<T>(dx_, rhs.dx_, eps_) &&
-               equal<T>(dy_, rhs.dy_, eps_) &&
+        return equal<T>(dx_, rhs.dx_, eps_) && equal<T>(dy_, rhs.dy_, eps_) &&
                equal<T>(dz_, rhs.dz_, eps_);
     }
 
@@ -79,8 +81,7 @@ public:
     bool is_zero() const {
         check_validity();
 
-        return zero<T>(dx_, eps_) && zero<T>(dy_, eps_) &&
-               zero<T>(dz_, eps_);
+        return zero<T>(dx_, eps_) && zero<T>(dy_, eps_) && zero<T>(dz_, eps_);
     }
 
     // bool is_zero() const {
@@ -91,14 +92,13 @@ public:
 
     bool is_normalized() const {
         check_validity();
-        return equal<T>(dx_*dx_ + dy_*dy_ + dz_*dz_, 1, eps_);
+        return equal<T>(dx_ * dx_ + dy_ * dy_ + dz_ * dz_, 1, eps_);
     }
 
     T enorm() const {
         check_validity();
         return std::sqrt(edot(*this));
     }
-
 
     T edot(const Vector<T> &other) const {
         check_validity();
@@ -119,7 +119,7 @@ public:
                          dz_ * other.dx_ - dx_ * other.dz_,
                          dx_ * other.dy_ - dy_ * other.dx_};
     }
-    
+
     bool collinear_with(const Vector<T> &other) const {
         check_validity();
         other.check_validity();
@@ -138,13 +138,13 @@ public:
 
         return zero<T>(edot(other), eps_);
     }
-    
-    Vector<T>& normalize() & {
+
+    Vector<T> &normalize() & {
         check_validity();
         T norm = enorm();
         if (zero<T>(norm, eps_) || equal<T>(norm, 1, eps_))
             return *this;
-            
+
         assert(zero<T>(norm, eps_) == false);
         dx_ = dx_ / norm;
         dy_ = dy_ / norm;
@@ -157,29 +157,28 @@ public:
         check_validity();
         T norm = enorm();
         if (zero<T>(norm, eps_) || equal<T>(norm, 1, eps_))
-            return Vector<T> {*this};
-        
-        assert(zero<T>(norm, eps_) == false);
-        return Vector<T> {dx_ / norm, dy_ / norm, dz_ / norm};
-    }
+            return Vector<T>{*this};
 
+        assert(zero<T>(norm, eps_) == false);
+        return Vector<T>{dx_ / norm, dy_ / norm, dz_ / norm};
+    }
 
     Vector<T> get_perpendicular() const {
         check_validity();
         if (is_zero())
-            return Vector<T> {};
+            return Vector<T>{};
 
         if (std::abs(dx_) < std::abs(dy_) && std::abs(dx_) < std::abs(dz_))
-            return ecross(Vector<T> {1, 0, 0});
+            return ecross(Vector<T>{1, 0, 0});
         else if (std::abs(dy_) < std::abs(dz_))
-            return ecross(Vector<T> {0, 1, 0});
+            return ecross(Vector<T>{0, 1, 0});
         else
-            return ecross(Vector<T> {0, 0, 1});
+            return ecross(Vector<T>{0, 0, 1});
     }
 
     std::string to_string() const {
-        return "Vec(" + std::to_string(dx_) + ", " +
-               std::to_string(dy_) + ", " + std::to_string(dz_) + ")";
+        return "Vec(" + std::to_string(dx_) + ", " + std::to_string(dy_) +
+               ", " + std::to_string(dz_) + ")";
     }
 };
 } // namespace triangles

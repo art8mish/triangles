@@ -37,7 +37,8 @@ public:
     }
 
     Line(const Point<T> &p1, const Point<T> &p2)
-        : Line(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z) {}
+        : Line(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z) {
+    }
 
     Line(const Point<T> &p, const Vector<T> &v) : p_{p}, d_{v} {
         validate();
@@ -86,7 +87,7 @@ public:
         check_validity();
         return d_;
     }
-    
+
     const Point<T> &point() const & {
         check_validity();
         return p_;
@@ -94,11 +95,8 @@ public:
 
     Point<T> get_point(T t) const {
         check_validity();
-        return Point<T> {
-            p_.x + d_.x() * t,  
-            p_.y + d_.y() * t,
-            p_.z + d_.z() * t
-        };
+        return Point<T>{p_.x + d_.x() * t, p_.y + d_.y() * t,
+                        p_.z + d_.z() * t};
     }
 
     bool operator==(const Line<T> &other) const {
@@ -128,8 +126,7 @@ public:
     }
 
     std::string to_string() const {
-        return "Line(" + p_.to_string() + " + " + d_.to_string() +
-               "* t)";
+        return "Line(" + p_.to_string() + " + " + d_.to_string() + "* t)";
     }
 };
 } // namespace triangles

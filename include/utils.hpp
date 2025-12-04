@@ -1,9 +1,9 @@
 #pragma once
 
 #include <concepts>
+#include <limits>
 #include <type_traits>
 #include <utility>
-#include <limits>
 
 namespace triangles {
 const char *LOG_PATH = "logs/triangles.log";
@@ -39,13 +39,11 @@ bool equal(const T &num1, const T &num2, const T &eps) {
     return std::abs(num1 - num2) < eps;
 }
 
-template <std::floating_point T>
-bool zero(const T &num, const T &eps) {
+template <std::floating_point T> bool zero(const T &num, const T &eps) {
     return std::abs(num) < eps;
 }
 
-template <std::floating_point T>
-bool valid(const T &num) {
+template <std::floating_point T> bool valid(const T &num) {
     return std::isfinite(num) && !std::isnan(num);
 }
 
@@ -54,8 +52,8 @@ bool valid(const T &num) {
 // | a2*x + b2*y + c2 = 0
 // returns std::pair(x, y)
 template <std::floating_point T = double>
-std::pair<T, T> solve_system(const T &a1, const T &b1, const T &c1,
-                             const T &a2, const T &b2, const T &c2) {
+std::pair<T, T> solve_system(const T &a1, const T &b1, const T &c1, const T &a2,
+                             const T &b2, const T &c2) {
     T x = nan<T>();
     T y = nan<T>();
 
