@@ -33,8 +33,6 @@ public:
         return valid(x) && valid(y) && valid(z);
     }
 
-    
-
     static Point<T> get_invalid() {
         return Point<T>{nan<T>(), nan<T>(), nan<T>()};
     }
@@ -58,6 +56,26 @@ public:
     bool operator!=(const Point<T> &rhs) const {
         return !(*this == rhs);
     }
+
+    // std::partial_ordering operator<=>(const Point<T>& rhs) const {
+    //     if (!is_valid() || !rhs.is_valid())
+    //         return std::partial_ordering::unordered;
+
+    //     if (equal<T>(x, rhs.x, eps_) && 
+    //         equal<T>(y, rhs.y, eps_) && 
+    //         equal<T>(z, rhs.z, eps_)) {
+    //         return std::partial_ordering::equivalent;
+    //     }
+
+    //     if ((rhs.x - x > eps_) && (rhs.y - y > eps_) && (rhs.z - z > eps_))  return std::partial_ordering::less;
+    //     if (x - rhs.x > eps_) && return std::partial_ordering::greater;
+    //     if (rhs.y - y > eps_) && return std::partial_ordering::less;
+    //     if (y - rhs.y > eps_) && return std::partial_ordering::greater;
+    //     if (z + eps_ < rhs.z) && return std::partial_ordering::less;
+    //     if (rhs.z + eps_ < z) return std::partial_ordering::greater;
+        
+    //     return std::partial_ordering::unordered; // Точки "почти равны" но не совсем
+    // }
 
     std::string to_string() const {
         return "Point(" + std::to_string(x) + ", " + std::to_string(y) + ", " +

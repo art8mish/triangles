@@ -8,6 +8,8 @@
 #include <limits>
 #include <string>
 #include <vector>
+#include <cassert>
+
 
 #include <line.hpp>
 #include <plane.hpp>
@@ -23,7 +25,7 @@ template <std::floating_point T> class Triangle {
     T eps_{epsilon<T>()};
 
 public:
-    enum class Kind {
+    enum struct Kind {
         TRIANGLE,
         SEGMENT, // one point is lying between two another (or
                  // two equal), after validation:
@@ -31,6 +33,16 @@ public:
         POINT,   // three points are equal
         INVALID  // point is invalid
     };
+
+    const Point<T> &p1() const {
+        return p1_;
+    }
+    const Point<T> &p2() const {
+        return p2_;
+    }
+    const Point<T> &p3() const{
+        return p3_; 
+    }
 
 private:
     Kind kind_{Kind::INVALID};
