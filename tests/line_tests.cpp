@@ -1,11 +1,12 @@
 
 #include <fstream>
+#include <stdexcept>
 #include <gtest/gtest.h>
 
-#include <line.hpp>
-#include <point.hpp>
-#include <utils.hpp>
-#include <vector.hpp>
+#include "line.hpp"
+#include "point.hpp"
+#include "utils.hpp"
+#include "vector.hpp"
 
 using triangles::nan;
 
@@ -214,4 +215,36 @@ TEST_F(TestLine, ParallelLines) {
     ASSERT_FALSE(line_invalid.is_valid());
     ASSERT_THROW(line_invalid.parallel_to(line1), std::logic_error);
     ASSERT_THROW(line1.parallel_to(line_invalid), std::logic_error);
+}
+
+TEST_F(TestLine, PlaneIntersectionPoint) {
+    point_t p1{1, 2, 3};
+    point_t p2{2, 4, 5};
+    point_t p3{1, 4, 1};
+
+    plane_t plane1{p1, p2, p3};
+    ASSERT_TRUE(plane1.is_valid());
+    
+    point_t p1_perp2{-3, 3, 4};
+    line_t line_perpendicular {p1, p1_perp2};
+    ASSERT_TRUE(line_perpendicular.is_valid());
+    ASSERT_TRUE(line_perpendicular.intersection_point(plane1) == p1);
+
+    line_t line_paral{p1, p2};
+    ASSERT_THROW(line_paral.intersection_point(plane1), std::logic_error);
+
+    point_t p2_perp2{-2, 5, 6};
+    line_t line_seq{p2_perp2, p1};
+    ASSERT_TRUE(line_seq.intersection_point(plane1) == p1);
+
+    point_t p1_perp1{-1, 2.5, 3.5};
+    point_t p1_p2_perp2_mid{-0.5, 3.5, 4.5};
+    point_t p3_perp1{-1, 4.5, 1.5};
+    plane_t plane2{p1_perp1, p1_p2_perp2_mid, p3_perp1};
+    ASSERT_TRUE(plane2.is_valid());
+
+    // std::cout << "Intersec point: " +
+    // tr_t::plane_line_intersection_point(plane2, line_seq).to_string() + '\n';
+    ASSERT_TRUE(line_seq.intersection_point(plane2) == p1_p2_perp2_mid);
+    ASSERT_THROW(line_paral.intersection_point(plane2), std::invalid_argument);
 }

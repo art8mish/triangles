@@ -4,17 +4,13 @@
 #include <concepts>
 #include <limits>
 #include <string>
+#include <stdexcept>
 
-#include <utils.hpp>
+#include "utils.hpp"
 
 namespace triangles {
 template <std::floating_point T> class Point {
     T eps_{epsilon<T>()};
-
-    void check_validity() const {
-        if (!is_valid())
-            throw std::logic_error(to_string() + " is not valid");
-    }
 
 public:
     T x{0};
@@ -27,6 +23,11 @@ public:
     Point(T x, T y) : Point(x, y, 0) {
     }
     Point(T x) : Point(x, 0, 0) {
+    }
+
+    void check_validity() const {
+        if (!is_valid())
+            throw std::logic_error(to_string() + " is not valid");
     }
 
     bool is_valid() const {

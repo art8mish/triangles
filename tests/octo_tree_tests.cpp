@@ -1,9 +1,9 @@
 #include <fstream>
 #include <gtest/gtest.h>
 
-#include <point.hpp>
-#include <triangles.hpp>
-#include <octo_tree.hpp>
+#include "point.hpp"
+#include "triangles.hpp"
+#include "octo_tree.hpp"
 
 using triangles::nan;
 
@@ -14,6 +14,8 @@ protected:
     using Point = typename triangles::Point<double>;
 
     Point p_zero{};
+    Point p_min {-3, -3, -3};
+    Point p_max {3, 3, 3};
 
     Point p_octI_1 {2, 1, 1};
     Point p_octI_2 {1, 2, 1};
@@ -63,13 +65,16 @@ TEST_F(TestOctoTree, DefaultInit) {
     Triangle tr_octVII {p_octVII_1, p_octVII_2, p_octVII_3};
     Triangle tr_octVIII {p_octVIII_1, p_octVIII_2, p_octVIII_3};
 
-    OctoTree tree{};
+    OctoTree tree{p_min, p_max};
     tree.add_triangle(tr_octI);
     tree.add_triangle(tr_octII);
     tree.add_triangle(tr_octIII);
     tree.add_triangle(tr_octIV);
     tree.add_triangle(tr_octV);
     tree.add_triangle(tr_octVI);
+    tree.add_triangle(tr_octVII);
+    tree.add_triangle(tr_octVIII);
+    tree.dump();
     tree.add_triangle(tr_octVIII);
     tree.dump();
 }

@@ -6,10 +6,10 @@
 #include <string>
 #include <utility>
 
-#include <plane.hpp>
-#include <point.hpp>
-#include <utils.hpp>
-#include <vector.hpp>
+#include "plane.hpp"
+#include "point.hpp"
+#include "utils.hpp"
+#include "vector.hpp"
 
 namespace triangles {
 template <std::floating_point T> class Line {
@@ -123,6 +123,31 @@ public:
         if (p_ == point)
             return true;
         return d_.collinear_with(Vector<T>{p_, point});
+    }
+
+    Point<T> intersection_point(const Plane<T> &plane) const {
+        const Vector<T> &n = plane.normal();
+
+        if (n.orthogonal_to(d_)) {
+            throw std::invalid_argument(plane.to_string() + " shouldn't be parallel with " + to_string());
+        }
+
+        const Point<T> &line_p =
+            (p_ == plane.point()) ? get_point(1) : p_;
+        // std::cout << "Line point: " + line_p.to_string() + '\n';
+
+        const Vector<T> v{line_p, plane.point()};
+        // std::cout << "V: " + v.to_string() + '\n';
+        // std::cout << "n: " + n.to_string() + '\n';
+        // std::cout << "d: " + d.to_string() + '\n';
+
+        T t = n.edot(v) / n.edot(d_);
+        // std::cout << "n.edot(v): " + std::to_string(n.edot(v)) + '\n';
+        // std::cout << "n.edot(d): " + std::to_string(n.edot(d)) + '\n';
+        // std::cout << "t: " + std::to_string(t) + '\n';
+        if (p_ == plane.point())
+            t += 1;
+        return get_point(t);
     }
 
     std::string to_string() const {

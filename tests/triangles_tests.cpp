@@ -1,9 +1,10 @@
 #include <fstream>
+#include <stdexcept>
 #include <gtest/gtest.h>
 
-#include <point.hpp>
-#include <triangles.hpp>
-#include <utils.hpp>
+#include "point.hpp"
+#include "triangles.hpp"
+#include "utils.hpp"
 
 using triangles::nan;
 
@@ -18,7 +19,7 @@ protected:
     // vec_t = typename triangles::Vector<double>;
     point_t p_zero{};
 
-    // see geogebra/segment_segment.ggb
+    // see geogebra/triangle_segment.ggb
     vec_t d_a{1, 2, 2};
 
     point_t p_a11{1, 2, 3};
@@ -53,19 +54,34 @@ protected:
 
     point_t p_b11{1, 3, 2};
     line_t l_b1{p_b11, d_a};
+    point_t p_b115{l_b1.get_point(0.25)};
     point_t p_b12{l_b1.get_point(0.5)};
     point_t p_b13{l_b1.get_point(1)};
     point_t p_b14{l_b1.get_point(2)};
+    point_t p_b145{l_b1.get_point(2.5)};
     point_t p_b15{l_b1.get_point(3)};
     point_t p_b16{l_b1.get_point(4)};
     point_t p_b17{l_b1.get_point(5)};
 
     line_t l_nb{p_b11, n};
+    point_t p_b21{l_nb.get_point(1)};
+    line_t l_b2{p_a21, d_a};
+    point_t p_b215{l_b2.get_point(0.25)};
+    point_t p_b22{l_b2.get_point(0.5)};
+    point_t p_b23{l_b2.get_point(1)};
+    point_t p_b24{l_b2.get_point(2)};
+    point_t p_b245{l_b2.get_point(2.5)};
+    point_t p_b25{l_b2.get_point(3)};
+    point_t p_b26{l_b2.get_point(4)};
+    point_t p_b27{l_b2.get_point(5)};
+
     point_t p_b31{l_nb.get_point(2)};
     line_t l_b3{p_b31, d_a};
+    point_t p_b315{l_b3.get_point(0.25)};
     point_t p_b32{l_b3.get_point(0.5)};
     point_t p_b33{l_b3.get_point(1)};
     point_t p_b34{l_b3.get_point(2)};
+    point_t p_b345{l_b3.get_point(2.5)};
     point_t p_b35{l_b3.get_point(3)};
     point_t p_b36{l_b3.get_point(4)};
     point_t p_b37{l_b3.get_point(5)};
@@ -128,6 +144,20 @@ protected:
     point_t p_e195{l_e1.get_point(7.5)};
 
     line_t l_ne{p_e11, n};
+    point_t p_e21{l_ne.get_point(1)};
+    line_t l_e2{p_e21, d_c};
+    point_t p_e22{l_e2.get_point(0.5)};
+    point_t p_e225{l_e2.get_point(0.75)};
+    point_t p_e23{l_e2.get_point(1)};
+    point_t p_e24{l_e2.get_point(2)};
+    point_t p_e25{l_e2.get_point(3)};
+    point_t p_e26{l_e2.get_point(4)};
+    point_t p_e65{l_e2.get_point(4.5)}; // between e26 and e27
+    point_t p_e237{l_e2.get_point(5)};
+    point_t p_e28{l_e2.get_point(6)};
+    point_t p_e29{l_e2.get_point(7)};
+    point_t p_e295{l_e2.get_point(7.5)};
+
     point_t p_e31{l_ne.get_point(2)};
     line_t l_e3{p_e31, d_c};
     point_t p_e32{l_e3.get_point(0.5)};
@@ -144,6 +174,10 @@ protected:
 
     tr_t seg_a1{p_a11, p_a14, p_a15};
     tr_t seg_a3{p_a31, p_a34, p_a35};
+
+    tr_t tr_main1{p_a11, p_a15, p_e13};
+    tr_t tr_main2{p_a21, p_a25, p_e23};
+    
 
     void SetUp() {
     }
@@ -198,7 +232,6 @@ protected:
         tr_t seg1{p_1n, p_1n, p_end};
         tr_t seg2{p_2n, p_2n, p_end};
         tr_t seg3{p_3n, p_end, p_end};
-        std::cout << seg3.to_string() + '\n';
 
         EXPECT_EQ(seg1.type(), tr_t::Kind::SEGMENT) << context_msg;
         EXPECT_EQ(seg2.type(), tr_t::Kind::SEGMENT) << context_msg;
@@ -206,7 +239,6 @@ protected:
 
         tr_t tr1{p_a11, p_a15, tr_p1};
         tr_t tr3{p_a31, p_a35, tr_p3};
-        std::cout << tr1.to_string() + '\n';
 
         EXPECT_EQ(tr1.type(), tr_t::Kind::TRIANGLE) << context_msg;
         EXPECT_EQ(tr3.type(), tr_t::Kind::TRIANGLE) << context_msg;
@@ -230,74 +262,137 @@ protected:
         EXPECT_EQ(contain_p_end, tr1.intersects(seg3)) << context_msg;
     }
 
-    void TriangleTriangleIntersection(const point_t &p_1n, const point_t &p_2n,
-                                      const point_t &p_3n, const point_t &p_end,
-                                      const point_t &tr_p1,
-                                      const point_t &tr_p3, const bool sec,
-                                      const bool contain_p_n,
-                                      const bool contain_p_end,
-                                      const std::string &context = "") {
 
-        std::string context_msg{"Test: TriangleSegment"};
+    void TriangleTriangleIntersectionSide(const point_t &src3, const std::string &context = "") {
+        std::string context_msg{"Test:  TriangleTriangleBySide"};
+        context_msg += context;
+        
+        tr_t tr_in{src3, p_c13, p_b14};
+        EXPECT_EQ(tr_in.type(), tr_t::Kind::TRIANGLE) << context_msg;
+
+        EXPECT_TRUE(tr_main1.intersects(tr_in)) << context_msg;
+        EXPECT_TRUE(tr_in.intersects(tr_main1)) << context_msg;
+        EXPECT_TRUE(tr_main2.intersects(tr_in)) << context_msg;
+        EXPECT_TRUE(tr_in.intersects(tr_main2)) << context_msg;
+
+        tr_t tr_touch_in{src3, p_c13, p_a14};
+        EXPECT_EQ(tr_touch_in.type(), tr_t::Kind::TRIANGLE) << context_msg;
+
+        EXPECT_TRUE(tr_main1.intersects(tr_touch_in)) << context_msg;
+        EXPECT_TRUE(tr_touch_in.intersects(tr_main1)) << context_msg;
+        EXPECT_TRUE(tr_main2.intersects(tr_touch_in)) << context_msg;
+        EXPECT_TRUE(tr_touch_in.intersects(tr_main2)) << context_msg;
+
+        tr_t tr_touch_out{src3, p_d3, p_a14};
+        EXPECT_EQ(tr_touch_out.type(), tr_t::Kind::TRIANGLE) << context_msg;
+
+        EXPECT_TRUE(tr_main1.intersects(tr_touch_out)) << context_msg;
+        EXPECT_TRUE(tr_touch_out.intersects(tr_main1)) << context_msg;
+        EXPECT_TRUE(tr_main2.intersects(tr_touch_out)) << context_msg;
+        EXPECT_TRUE(tr_touch_out.intersects(tr_main2)) << context_msg;
+
+        tr_t tr_side{src3, p_a13, p_a14};
+        EXPECT_EQ(tr_side.type(), tr_t::Kind::TRIANGLE) << context_msg;
+
+        EXPECT_TRUE(tr_main1.intersects(tr_side)) << context_msg;
+        EXPECT_TRUE(tr_side.intersects(tr_main1)) << context_msg;
+        EXPECT_TRUE(tr_main2.intersects(tr_side)) << context_msg;
+        EXPECT_TRUE(tr_side.intersects(tr_main2)) << context_msg;
+
+        tr_t tr_out{src3, p_c17, p_e17};
+        EXPECT_EQ(tr_out.type(), tr_t::Kind::TRIANGLE);
+
+        EXPECT_FALSE(tr_main1.intersects(tr_out)) << context_msg;
+        EXPECT_FALSE(tr_out.intersects(tr_main1)) << context_msg;
+        EXPECT_FALSE(tr_main2.intersects(tr_out)) << context_msg;
+        EXPECT_FALSE(tr_out.intersects(tr_main2)) << context_msg;
+    }
+
+    void TriangleTriangleIntersectionCrossCase(const point_t &src1, const point_t &src3, 
+        const point_t &dst2, const point_t &dst3, 
+        bool sec_src, bool sec_dst2, bool sec_dst3, const std::string &context = "") {
+
+        tr_t tr2{src1, src3, dst2};
+        EXPECT_EQ(tr2.type(), tr_t::Kind::TRIANGLE) << context;
+
+        EXPECT_EQ(sec_src, tr_main1.intersects(tr2)) << context;
+        EXPECT_EQ(sec_src, tr2.intersects(tr_main1)) << context;
+        EXPECT_EQ(sec_src || sec_dst2, tr_main2.intersects(tr2)) << context;
+        EXPECT_EQ(sec_src || sec_dst2, tr2.intersects(tr_main2)) << context;
+
+        tr_t tr3{src1, src3, dst3};
+        EXPECT_EQ(tr3.type(), tr_t::Kind::TRIANGLE) << context;
+
+        EXPECT_EQ(sec_src, tr_main1.intersects(tr3)) << context;
+        EXPECT_EQ(sec_src, tr3.intersects(tr_main1)) << context;
+        EXPECT_EQ(sec_src || sec_dst3, tr_main2.intersects(tr3)) << context;
+        EXPECT_EQ(sec_src || sec_dst3, tr3.intersects(tr_main2)) << context;
+    }
+
+    void TriangleTriangleIntersectionCross(const point_t &src1, const point_t &src3, bool sec_src, const std::string &context = "") {
+        std::string context_msg{"Test:  TriangleTriangleCross"};
+        context_msg += context;
+        
+        TriangleTriangleIntersectionCrossCase(src1, src3, p_b24, p_b34, sec_src, true, true, context_msg + "DstIn");
+        TriangleTriangleIntersectionCrossCase(src1, src3, p_a24, p_a34, sec_src, true, true, context_msg + "DstTouchSideFar");
+        TriangleTriangleIntersectionCrossCase(src1, src3, p_b215, p_b315, sec_src, true, false, context_msg + "DstTouchSideClose");
+        TriangleTriangleIntersectionCrossCase(src1, src3, p_a21, p_a31, sec_src, true, false, context_msg + "DstTouchEdge");
+        TriangleTriangleIntersectionCrossCase(src1, src3, p_b21, p_b31, sec_src, false, false, context_msg + "DstOut");
+    }
+
+    void TriangleTriangleIntersectionParallel(
+        const point_t &tr2_p1, const point_t &tr2_p2, const point_t &tr2_p3,
+        const point_t &tr3_p1, const point_t &tr3_p2, const point_t &tr3_p3,
+        const std::string &context = "") {
+        std::string context_msg{"Test:  TriangleTriangleParallel"};
         context_msg += context;
 
-        tr_t seg1{p_1n, p_1n, p_end};
-        tr_t seg2{p_2n, p_2n, p_end};
-        tr_t seg3{p_3n, p_end, p_end};
-        std::cout << seg3.to_string() + '\n';
+        tr_t tr2{tr2_p1, tr2_p2, tr2_p3};
+        tr_t tr2_1{tr3_p1, tr2_p2, tr2_p3};
+        tr_t tr2_2{tr2_p1, tr3_p2, tr2_p3};
+        tr_t tr2_3{tr2_p1, tr2_p2, tr3_p3};
 
-        EXPECT_EQ(seg1.type(), tr_t::Kind::SEGMENT) << context_msg;
-        EXPECT_EQ(seg2.type(), tr_t::Kind::SEGMENT) << context_msg;
-        EXPECT_EQ(seg3.type(), tr_t::Kind::SEGMENT) << context_msg;
+        EXPECT_EQ(tr2.type(), tr_t::Kind::TRIANGLE) << context;
+        EXPECT_EQ(tr2_1.type(), tr_t::Kind::TRIANGLE) << context;
+        EXPECT_EQ(tr2_2.type(), tr_t::Kind::TRIANGLE) << context;
+        EXPECT_EQ(tr2_3.type(), tr_t::Kind::TRIANGLE) << context;
 
-        tr_t tr1{p_a11, p_a15, tr_p1};
-        tr_t tr3{p_a31, p_a35, tr_p3};
-        std::cout << tr1.to_string() + '\n';
+        EXPECT_FALSE(tr_main1.intersects(tr2)) << context;
+        EXPECT_FALSE(tr2.intersects(tr_main1)) << context;
+        EXPECT_FALSE(tr_main1.intersects(tr2_1)) << context;
+        EXPECT_FALSE(tr2_1.intersects(tr_main1)) << context;
+        EXPECT_FALSE(tr_main1.intersects(tr2_2)) << context;
+        EXPECT_FALSE(tr2_2.intersects(tr_main1)) << context;
+        EXPECT_FALSE(tr_main1.intersects(tr2_3)) << context;
+        EXPECT_FALSE(tr2_3.intersects(tr_main1)) << context;
 
-        EXPECT_EQ(tr1.type(), tr_t::Kind::TRIANGLE) << context_msg;
-        EXPECT_EQ(tr3.type(), tr_t::Kind::TRIANGLE) << context_msg;
+        tr_t tr3{tr3_p1, tr3_p2, tr3_p3};
+        tr_t tr3_1{tr2_p1, tr3_p2, tr3_p3};
+        tr_t tr3_2{tr3_p1, tr2_p2, tr3_p3};
+        tr_t tr3_3{tr3_p1, tr3_p2, tr2_p3};
 
-        EXPECT_EQ(sec, seg1.intersects(tr1)) << context_msg;
-        EXPECT_EQ(sec, tr1.intersects(seg1)) << context_msg;
+        EXPECT_EQ(tr3.type(), tr_t::Kind::TRIANGLE) << context;
+        EXPECT_EQ(tr3_1.type(), tr_t::Kind::TRIANGLE) << context;
+        EXPECT_EQ(tr3_2.type(), tr_t::Kind::TRIANGLE) << context;
+        EXPECT_EQ(tr3_3.type(), tr_t::Kind::TRIANGLE) << context;
 
-        // paral
-        EXPECT_FALSE(seg1.intersects(tr3)) << context_msg;
-        EXPECT_FALSE(tr3.intersects(seg1)) << context_msg;
-
-        // arbitrary
-        EXPECT_FALSE(seg2.intersects(tr3)) << context_msg;
-        EXPECT_FALSE(tr3.intersects(seg2)) << context_msg;
-
-        // touch
-        EXPECT_EQ(contain_p_n, seg3.intersects(tr3)) << context_msg;
-        EXPECT_EQ(contain_p_n, tr3.intersects(seg3)) << context_msg;
-
-        EXPECT_EQ(contain_p_end, seg3.intersects(tr1)) << context_msg;
-        EXPECT_EQ(contain_p_end, tr1.intersects(seg3)) << context_msg;
+        EXPECT_FALSE(tr_main1.intersects(tr3)) << context;
+        EXPECT_FALSE(tr3.intersects(tr_main1)) << context;
+        EXPECT_FALSE(tr_main1.intersects(tr3_1)) << context;
+        EXPECT_FALSE(tr3_1.intersects(tr_main1)) << context;
+        EXPECT_FALSE(tr_main1.intersects(tr3_2)) << context;
+        EXPECT_FALSE(tr3_2.intersects(tr_main1)) << context;
+        EXPECT_FALSE(tr_main1.intersects(tr3_3)) << context;
+        EXPECT_FALSE(tr3_3.intersects(tr_main1)) << context;
     }
 };
 
-TEST_F(TestTriangles, PlaneLineIntersectionPoint) {
-    plane_t plane1{p_a11, p_a12, p_b11};
-    ASSERT_TRUE(plane1.is_valid());
-    ASSERT_TRUE(tr_t::plane_line_intersection_point(plane1, l_na) == p_a11);
 
-    line_t line_paral{p_a11, p_a13};
-    ASSERT_THROW(tr_t::plane_line_intersection_point(plane1, line_paral),
-                 std::logic_error);
-
-    line_t line_seq{p_a33, p_a11};
-    ASSERT_TRUE(tr_t::plane_line_intersection_point(plane1, line_seq) == p_a11);
-
-    plane_t plane2{p_a21, p_a22, p_c21};
-    ASSERT_TRUE(plane2.is_valid());
-
-    // std::cout << "Intersec point: " +
-    // tr_t::plane_line_intersection_point(plane2, line_seq).to_string() + '\n';
-    ASSERT_TRUE(tr_t::plane_line_intersection_point(plane2, line_seq) == p_a22);
-    ASSERT_THROW(tr_t::plane_line_intersection_point(plane2, line_paral),
-                 std::logic_error);
+TEST_F(TestTriangles, InitCustom) {
+    tr_t tr1{p_c31, p_d3, p_a14};
+    ASSERT_TRUE(tr1.intersects(tr_main2));
 }
+
 
 TEST_F(TestTriangles, InitInvalid) {
     point_t p_invalid{1, 2, nan<double>()};
@@ -307,6 +402,12 @@ TEST_F(TestTriangles, InitInvalid) {
 }
 
 TEST_F(TestTriangles, InitValid) {
+    ASSERT_TRUE(tr_main1.is_valid());
+    EXPECT_EQ(tr_main1.type(), tr_t::Kind::TRIANGLE);
+
+    ASSERT_TRUE(tr_main2.is_valid());
+    EXPECT_EQ(tr_main2.type(), tr_t::Kind::TRIANGLE);
+
     tr_t tr1{p_zero, p_a11, p_b11};
     ASSERT_TRUE(tr1.is_valid());
     ASSERT_EQ(tr1.type(), tr_t::Kind::TRIANGLE);
@@ -708,24 +809,24 @@ TEST_F(TestTriangles, IntersectionTriangleSegmentPerpendicularSecOut) {
                                 true, false, "PerpendicularSecOutRight");
 
     TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_a17, p_c18, p_c38, true,
-                                false, true, "PerpendicularEndSecOutLeft");
+                                false, false, "PerpendicularEndSecOutLeft");
     TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_a17, p_c17, p_c37, true,
-                                true, true, "PerpendicularEndSecOutMid");
+                                true, false, "PerpendicularEndSecOutMid");
     TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_a17, p_e195, p_e395,
-                                true, true, true,
+                                true, true, false,
                                 "PerpendicularEndSecOutMidUp");
     TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_a17, p_e18, p_e38, true,
-                                true, true, "PerpendicularEndSecOutRight");
+                                true, false, "PerpendicularEndSecOutRight");
 
     TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_b17, p_c18, p_c38, true,
-                                false, true, "PerpendicularNoSecOutCLeft");
+                                false, false, "PerpendicularNoSecOutCLeft");
     TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_b17, p_c17, p_c37, true,
-                                true, true, "PerpendicularNoSecOutCMid");
+                                true, false, "PerpendicularNoSecOutCMid");
     TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_b17, p_e195, p_e395,
-                                true, true, true,
+                                true, true, false,
                                 "PerpendicularNoSecOutCMidUp");
     TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_b17, p_e18, p_e38, true,
-                                true, true, "PerpendicularNoSecOutCRight");
+                                true, false, "PerpendicularNoSecOutCRight");
 
     TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_b17, p_b11, p_b31, false,
                                 false, false, "PerpendicularNoSecOutBLeft");
@@ -790,3 +891,36 @@ TEST_F(TestTriangles, IntersectionTriangleTriangle2D) {
     EXPECT_TRUE(tr8.intersects(tr10));
     EXPECT_TRUE(tr10.intersects(tr8));    
 }
+
+TEST_F(TestTriangles, IntersectionTriangleTriangle3D_Parallel) {
+    TriangleTriangleIntersectionParallel(p_a21, p_a25, p_e23, p_a31, p_a35, p_e33, "Same");
+    TriangleTriangleIntersectionParallel(p_b23, p_b24, p_c23, p_b33, p_b34, p_c33, "In");
+    TriangleTriangleIntersectionParallel(p_b23, p_b24, p_e23, p_b33, p_b34, p_e33, "InTouchEdge");
+    TriangleTriangleIntersectionParallel(p_b21, p_c21, p_e23, p_b31, p_c31, p_e33, "OutTouchEdge");
+    TriangleTriangleIntersectionParallel(p_b21, p_c21, p_b24, p_b31, p_c31, p_b34, "SecIn");
+    TriangleTriangleIntersectionParallel(p_b21, p_c21, p_b26, p_b31, p_c31, p_b36, "SecOut");
+}
+
+TEST_F(TestTriangles, IntersectionTriangleTriangle3D_Side) {
+    TriangleTriangleIntersectionSide(p_c31, "SrcOut");
+    TriangleTriangleIntersectionSide(p_b32, "SrcIn");
+}
+
+TEST_F(TestTriangles, IntersectionTriangleTriangle3D_Cross) {
+    TriangleTriangleIntersectionCross(p_c11, p_c31, false, "SrcOutPerpendicular");
+    TriangleTriangleIntersectionCross(p_c11, p_e32, false, "SrcOutAngled");
+
+    TriangleTriangleIntersectionCross(p_c13, p_c33, true,"SrcInPerpendicular");
+    TriangleTriangleIntersectionCross(p_c13, p_b33, true, "SrcInAngledIn");
+    TriangleTriangleIntersectionCross(p_c13, p_c32, true, "SrcInAngledOut");
+
+    TriangleTriangleIntersectionCross(p_e13, p_e33, true, "SrcEdgePerpendicular");
+    TriangleTriangleIntersectionCross(p_e13, p_c33, true, "SrcEdgeAngledIn");
+    TriangleTriangleIntersectionCross(p_c12, p_e33, false, "SrcEdgeAngledOut");
+
+    TriangleTriangleIntersectionCross(p_b145, p_b345, true,"SrcSidePerpendicular");
+    TriangleTriangleIntersectionCross(p_b115, p_b32, true, "SrcSideAngledIn");
+    TriangleTriangleIntersectionCross(p_b14, p_b35,  true, "SrcSideAngledTouch");
+    
+}
+

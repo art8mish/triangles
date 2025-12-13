@@ -1,12 +1,13 @@
 
 #include <cmath>
+#include <stdexcept>
 #include <fstream>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include <point.hpp>
-#include <utils.hpp>
-#include <vector.hpp>
+#include "point.hpp"
+#include "utils.hpp"
+#include "vector.hpp"
 
 using triangles::equal;
 using triangles::nan;

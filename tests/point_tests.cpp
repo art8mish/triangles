@@ -1,7 +1,7 @@
 #include <fstream>
 #include <gtest/gtest.h>
 
-#include <point.hpp>
+#include "point.hpp"
 
 using triangles::nan;
 

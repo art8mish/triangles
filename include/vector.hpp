@@ -4,9 +4,10 @@
 #include <concepts>
 #include <limits>
 #include <string>
+#include <stdexcept>
 
-#include <point.hpp>
-#include <utils.hpp>
+#include "point.hpp"
+#include "utils.hpp"
 
 namespace triangles {
 template <std::floating_point T> class Vector {

@@ -6,9 +6,8 @@
 #include <utility>
 
 namespace triangles {
-const char *LOG_PATH = "logs/triangles.log";
-
-template <std::floating_point T> T epsilon() {
+template <std::floating_point T> 
+T epsilon() {
     if (std::is_same_v<T, double>)
         return 1e-9;
     else if (std::is_same_v<T, long double>)

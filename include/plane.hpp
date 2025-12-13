@@ -5,9 +5,9 @@
 #include <stdexcept>
 #include <string>
 
-#include <point.hpp>
-#include <utils.hpp>
-#include <vector.hpp>
+#include "point.hpp"
+#include "utils.hpp"
+#include "vector.hpp"
 
 namespace triangles {
 template <std::floating_point T> class Plane {
@@ -71,7 +71,6 @@ public:
     T signed_distance(const Point<T> &point) const {
         check_validity();
         point.check_validity();
-
         return n_.edot(Vector{p_, point});
     }
 

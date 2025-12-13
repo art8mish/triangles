@@ -9,13 +9,13 @@
 #include <string>
 #include <vector>
 #include <cassert>
+#include <stdexcept>
 
-
-#include <line.hpp>
-#include <plane.hpp>
-#include <point.hpp>
-#include <utils.hpp>
-#include <vector.hpp>
+#include "line.hpp"
+#include "plane.hpp"
+#include "point.hpp"
+#include "utils.hpp"
+#include "vector.hpp"
 
 namespace triangles {
 template <std::floating_point T> class Triangle {
@@ -152,11 +152,11 @@ private:
             return true;
 
         const T dist2 = plane.signed_distance(p2_);
-        if ((zero<T>(dist2, eps_)) || (dist1 * dist2 < 0))
+        if ((zero<T>(dist2, eps_)) || (dist1 * dist2 < -eps_))
             return true;
 
         const T dist3 = plane.signed_distance(p3_);
-        if ((zero<T>(dist3, eps_)) || (dist2 * dist3 < 0))
+        if ((zero<T>(dist3, eps_)) || (dist2 * dist3 < -eps_))
             return true;
 
         return false;
@@ -167,7 +167,6 @@ private:
     T line_intersection_point_(const Line<T> &line, const Point<T> &p1,
                                const T &sdist1, const Point<T> &p2,
                                const T &sdist2) const {
-
         const Vector<T> &line_dir = line.direction();
         const Point<T> &line_p = line.point();
 
@@ -178,9 +177,10 @@ private:
         const T proj2 = line_dir.edot(Vector{line_p, p2});
         if (zero<T>(sdist2, eps_))
             return proj2;
-        if (sdist1 * sdist2 > 0)
-            return nan<T>();
 
+        if (sdist1 * sdist2 > eps_)
+            return nan<T>();
+        
         return proj1 + (proj2 - proj1) * sdist1 / (sdist1 - sdist2);
     }
 
@@ -191,13 +191,26 @@ private:
         const T sdist1 = plane.signed_distance(p1_);
         const T sdist2 = plane.signed_distance(p2_);
         const T sdist3 = plane.signed_distance(p3_);
+        //std::cout << "Dists: d(P1)=" << sdist1 << ", d(P2)=" << sdist2 << ", d(P3)=" << sdist3 << "\n";
+        T t0 = nan<T>();
+        T t1 = nan<T>();
 
-        T t0 = line_intersection_point_(line, p1_, sdist1, p2_, sdist2);
-        T t1 = line_intersection_point_(line, p1_, sdist1, p3_, sdist3);
-        if (!valid(t0))
-            t0 = line_intersection_point_(line, p2_, sdist2, p3_, sdist3);
-        else if (!valid(t1))
-            t1 = line_intersection_point_(line, p2_, sdist2, p3_, sdist3);
+        T t_12 = line_intersection_point_(line, p1_, sdist1, p2_, sdist2);
+        T t_13 = line_intersection_point_(line, p1_, sdist1, p3_, sdist3);
+        T t_23 = line_intersection_point_(line, p2_, sdist2, p3_, sdist3);
+
+        //std::cout << "t0 [P1, P2] sec: " << t0 << "\n";
+        //std::cout << "t0 is not valid -> [P1, P3] sec: " << t0 << "\n";
+
+        if (!valid(t_12) || !valid(t_13) || !valid(t_23)) {
+            if (!valid(t_12)) {t0 = t_13; t1 = t_23;}
+            else if (!valid(t_13)) {t0 = t_12; t1 = t_23;}
+            else {t0 = t_12; t1 = t_13;}
+        }
+        else {
+            if (equal(t_12, t_13, eps_)) {t0 = t_12; t1 = t_23;}
+            else {t0 = t_12; t1 = t_13;}
+        }
         assert(valid(t0) && valid(t1));
         return std::pair<T, T>{std::min(t0, t1),
                                std::max(t0, t1)}; // can be the same
@@ -205,29 +218,42 @@ private:
 
     bool triangle_triangle_intersection_(const Triangle<T> &other) const {
         assert(kind_ == Kind::TRIANGLE && other.kind_ == Kind::TRIANGLE);
+        //std::cout << "Intersection:\n" << "This: " << to_string() << "\n" << "Other: " << other.to_string() << "\n";
 
         const Plane<T> this_plane = get_plane();
         assert(this_plane.is_valid());
 
-        if (!other.intersects_plane_(this_plane))
+        if (!other.intersects_plane_(this_plane)) {
+            //std::cout << "Other triangle does not intersects this plane\n";
             return false;
-
+        }
+        
         const Plane<T> other_plane = other.get_plane();
         assert(other_plane.is_valid());
 
-        if (this_plane == other_plane)
+        if (this_plane == other_plane) {
+            //std::cout << "Planes are equal\n";
             return triangle_triangle_intersection_2d_(other);
+        }
 
-        if (!intersects_plane_(other_plane))
+        if (!intersects_plane_(other_plane)) {
+            //std::cout << "This triangle does not intersects other plane\n";
             return false;
+        }
 
         const Line<T> common_line{this_plane, other_plane};
         assert(common_line.is_valid());
+        //std::cout << "Common line:" << common_line.to_string() << "\n";
 
+        //std::cout << "Counting this segment...\n";
         const auto [this_a, this_b] =
             triangle_line_intersection_segment_(common_line, other_plane);
+        //std::cout << "This segment: [" << this_a << ", " << this_b << "]\n";
+        
+        //std::cout << "Counting other segment...\n";
         const auto [other_a, other_b] =
             other.triangle_line_intersection_segment_(common_line, this_plane);
+        //std::cout << "Other segment: [" << other_a << ", " << other_b << "]\n";
 
         return segments_intersect_(this_a, this_b, other_a, other_b);
     }
@@ -291,8 +317,6 @@ private:
 
         Plane<T> plane = get_plane();
         assert(plane.is_valid());
-        std::cout << plane.to_string() + "\n";
-
         const Line<T> line = other.to_line();
 
         assert(line.is_valid());
@@ -303,8 +327,8 @@ private:
             return triangle_segment_intersection_2d_(other);
         }
 
-        Point<T> intersection_p = plane_line_intersection_point(plane, line);
-        std::cout << "Intersec point: " + intersection_p.to_string() + '\n';
+        Point<T> intersection_p = line.intersection_point(plane);
+        
         if (!other.segment_point_intersection_(intersection_p))
             return false;
 
@@ -436,38 +460,6 @@ public:
             return triangle_segment_intersection_(other);
 
         return triangle_triangle_intersection_(other);
-    }
-
-    static Point<T> plane_line_intersection_point(const Plane<T> &plane,
-                                                  const Line<T> &line) {
-        const Vector<T> &n = plane.normal();
-        const Vector<T> &d = line.direction();
-
-        if (n.orthogonal_to(d)) {
-            throw std::logic_error(plane.to_string() + " and " +
-                                   line.to_string() +
-                                   " shouldn't be parallel.");
-            // if (plane.contains(line.point()))
-            //     return Point<T>::get_infinitive();
-            // return Point<T>::get_invalid();
-        }
-
-        const Point<T> &line_p =
-            (line.point() == plane.point()) ? line.get_point(1) : line.point();
-        // std::cout << "Line point: " + line_p.to_string() + '\n';
-
-        const Vector<T> v{line_p, plane.point()};
-        // std::cout << "V: " + v.to_string() + '\n';
-        // std::cout << "n: " + n.to_string() + '\n';
-        // std::cout << "d: " + d.to_string() + '\n';
-
-        T t = n.edot(v) / n.edot(d);
-        // std::cout << "n.edot(v): " + std::to_string(n.edot(v)) + '\n';
-        // std::cout << "n.edot(d): " + std::to_string(n.edot(d)) + '\n';
-        // std::cout << "t: " + std::to_string(t) + '\n';
-
-        return (line.point() == plane.point()) ? line.get_point(t + 1)
-                                               : line.get_point(t);
     }
 
     Plane<T> get_plane() const {

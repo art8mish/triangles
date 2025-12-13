@@ -1,11 +1,12 @@
 
 #include <fstream>
+#include <stdexcept>
 #include <gtest/gtest.h>
 
-#include <line.hpp>
-#include <point.hpp>
-#include <utils.hpp>
-#include <vector.hpp>
+#include "line.hpp"
+#include "point.hpp"
+#include "utils.hpp"
+#include "vector.hpp"
 
 using triangles::equal;
 using triangles::nan;
