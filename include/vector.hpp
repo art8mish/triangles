@@ -41,7 +41,7 @@ public:
     const T &x() const & {
         return dx_;
     }
-    final const T &y() const & {
+    const T &y() const & {
 
         return dy_;
     }

@@ -175,17 +175,12 @@ private:
         const T sdist1 = plane.signed_distance(p1_);
         const T sdist2 = plane.signed_distance(p2_);
         const T sdist3 = plane.signed_distance(p3_);
-        // std::cout << "Dists: d(P1)=" << sdist1 << ", d(P2)=" << sdist2 << ", d(P3)=" << sdist3 <<
-        // "\n";
         T t0 = nan<T>();
         T t1 = nan<T>();
 
         T t_12 = line_intersection_point_(line, p1_, sdist1, p2_, sdist2);
         T t_13 = line_intersection_point_(line, p1_, sdist1, p3_, sdist3);
         T t_23 = line_intersection_point_(line, p2_, sdist2, p3_, sdist3);
-
-        // std::cout << "t0 [P1, P2] sec: " << t0 << "\n";
-        // std::cout << "t0 is not valid -> [P1, P3] sec: " << t0 << "\n";
 
         if (!valid(t_12) || !valid(t_13) || !valid(t_23)) {
             if (!valid(t_12)) {
