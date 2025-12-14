@@ -23,7 +23,7 @@
 
 Зависимости проекта (c++20):
 
-```
+```bash
 sudo apt install -y \
     cmake \
     build-essential \
