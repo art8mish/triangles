@@ -19,14 +19,8 @@ template <std::floating_point T> class Line {
     Point<T> p_{};
     Vector<T> d_{};
 
-    bool validity_{false};
-    void validate() {
-        if (p_.is_valid() && d_.is_valid() && !d_.is_zero())
-            validity_ = true;
-    }
-
-    void check_validity() const {
-        if (!is_valid())
+    void validate() const {
+        if (!p_.is_valid() || d_.is_zero())
             throw std::logic_error(to_string() + " is not valid");
     }
 
@@ -50,8 +44,7 @@ public:
 
         d_ = n1.ecross(n2);
         if (d_.is_zero()) { // planes are parallel
-            validate();
-            throw std::logic_error(
+            throw std::invalid_argument(
                 "Can't find intersection line: planes are parallel "
                 "or coincident");
         }
@@ -79,30 +72,20 @@ public:
         validate();
     }
 
-    bool is_valid() const {
-        return validity_;
-    }
-
     const Vector<T> &direction() const & {
-        check_validity();
         return d_;
     }
 
     const Point<T> &point() const & {
-        check_validity();
         return p_;
     }
 
     Point<T> get_point(T t) const {
-        check_validity();
         return Point<T>{p_.x + d_.x() * t, p_.y + d_.y() * t,
                         p_.z + d_.z() * t};
     }
 
     bool operator==(const Line<T> &other) const {
-        check_validity();
-        other.check_validity();
-
         return contains(other.p_) && d_.collinear_with(other.d_);
     }
     bool operator!=(const Line<T> &other) const {
@@ -110,16 +93,10 @@ public:
     }
 
     bool parallel_to(const Line<T> &other) const {
-        check_validity();
-        other.check_validity();
-
         return d_.collinear_with(other.d_);
     }
 
     bool contains(const Point<T> &point) const {
-        check_validity();
-        point.check_validity();
-
         if (p_ == point)
             return true;
         return d_.collinear_with(Vector<T>{p_, point});

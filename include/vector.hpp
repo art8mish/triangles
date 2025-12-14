@@ -17,14 +17,8 @@ template <std::floating_point T> class Vector {
     T dy_{0};
     T dz_{0};
 
-    bool validity_{false};
-    void validate() {
-        if (valid(dx_) && valid(dy_) && valid(dz_))
-            validity_ = true;
-    }
-
-    void check_validity() const {
-        if (!is_valid())
+    void validate() const {
+        if (!valid(dx_) || !valid(dy_) || !valid(dz_))
             throw std::logic_error(to_string() + " is not valid");
     }
 
@@ -50,27 +44,19 @@ public:
         : Vector(from.x, from.y, from.z, to.x, to.y, to.z) {
     }
 
-    bool is_valid() const {
-        return validity_;
-    }
-
     const T &x() const & {
-        check_validity();
         return dx_;
     }
     const T &y() const & {
-        check_validity();
+
         return dy_;
     }
     const T &z() const & {
-        check_validity();
+
         return dz_;
     }
 
     bool operator==(const Vector<T> &rhs) const {
-        check_validity();
-        rhs.check_validity();
-
         return equal<T>(dx_, rhs.dx_, eps_) && equal<T>(dy_, rhs.dy_, eps_) &&
                equal<T>(dz_, rhs.dz_, eps_);
     }
@@ -80,50 +66,28 @@ public:
     }
 
     bool is_zero() const {
-        check_validity();
-
         return zero<T>(dx_, eps_) && zero<T>(dy_, eps_) && zero<T>(dz_, eps_);
     }
 
-    // bool is_zero() const {
-    //     check_validity();
-
-    //     return zero<T>(dx_ * dx_ + dy_ * dy_ + dz_ * dz_, eps_ * eps_);
-    // }
-
     bool is_normalized() const {
-        check_validity();
         return equal<T>(dx_ * dx_ + dy_ * dy_ + dz_ * dz_, 1, eps_);
     }
 
     T enorm() const {
-        check_validity();
         return std::sqrt(edot(*this));
     }
 
     T edot(const Vector<T> &other) const {
-        check_validity();
-        other.check_validity();
         return dx_ * other.dx_ + dy_ * other.dy_ + dz_ * other.dz_;
     }
-
-    // T edot(const Point<T> &point) const {
-    //     check_validity();
-    //     point.check_validity();
-    //     return dx_ * point.x_ + dy_ * point.y_ + dz_ * point.z_;
-    // }
-
+    
     Vector<T> ecross(const Vector<T> &other) const {
-        check_validity();
-        other.check_validity();
         return Vector<T>{dy_ * other.dz_ - dz_ * other.dy_,
                          dz_ * other.dx_ - dx_ * other.dz_,
                          dx_ * other.dy_ - dy_ * other.dx_};
     }
 
     bool collinear_with(const Vector<T> &other) const {
-        check_validity();
-        other.check_validity();
         return ecross(other).is_zero();
 
         // T k_x = dx_ / other.dx_;
@@ -134,14 +98,10 @@ public:
     }
 
     bool orthogonal_to(const Vector<T> &other) const {
-        check_validity();
-        other.check_validity();
-
         return zero<T>(edot(other), eps_);
     }
 
     Vector<T> &normalize() & {
-        check_validity();
         T norm = enorm();
         if (zero<T>(norm, eps_) || equal<T>(norm, 1, eps_))
             return *this;
@@ -155,7 +115,6 @@ public:
     }
 
     Vector<T> normalize() const && {
-        check_validity();
         T norm = enorm();
         if (zero<T>(norm, eps_) || equal<T>(norm, 1, eps_))
             return Vector<T>{*this};
@@ -165,7 +124,6 @@ public:
     }
 
     Vector<T> get_perpendicular() const {
-        check_validity();
         if (is_zero())
             return Vector<T>{};
 

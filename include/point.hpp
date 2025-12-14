@@ -13,19 +13,21 @@ template <std::floating_point T> class Point {
     T eps_{epsilon<T>()};
 
 public:
-    T x{0};
-    T y{0};
-    T z{0};
+    T x;
+    T y;
+    T z;
 
-    Point() = default;
     Point(T x, T y, T z) : x{x}, y{y}, z{z} {
     }
     Point(T x, T y) : Point(x, y, 0) {
     }
+    
     Point(T x) : Point(x, 0, 0) {
     }
 
-    void check_validity() const {
+    Point() : Point(0, 0, 0) {}
+
+    void validate() const {
         if (!is_valid())
             throw std::logic_error(to_string() + " is not valid");
     }
@@ -47,8 +49,8 @@ public:
     }
 
     bool operator==(const Point<T> &rhs) const {
-        check_validity();
-        rhs.check_validity();
+        validate();
+        rhs.validate();
 
         return equal<T>(x, rhs.x, eps_) && equal<T>(y, rhs.y, eps_) &&
                equal<T>(z, rhs.z, eps_);

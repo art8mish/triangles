@@ -24,40 +24,22 @@ protected:
 TEST_F(TestLine, InitZero) {
     point_t p_zero1{};
     point_t p_zero2{};
-    line_t line_def_zero1{p_zero1, p_zero2};
-    ASSERT_FALSE(line_def_zero1.is_valid());
-    ASSERT_THROW(line_def_zero1.point(), std::logic_error);
-    ASSERT_THROW(line_def_zero1.direction(), std::logic_error);
+    ASSERT_THROW((line_t {p_zero1, p_zero2}), std::logic_error);
 
     vec_t vec_zero{};
-    line_t line_def_zero2{p_zero1, vec_zero};
-    ASSERT_FALSE(line_def_zero2.is_valid());
-    ASSERT_THROW(line_def_zero2.point(), std::logic_error);
-    ASSERT_THROW(line_def_zero2.direction(), std::logic_error);
+    ASSERT_THROW((line_t {p_zero1, vec_zero}), std::logic_error);
 
-    line_t line_def_zero3{0, 0, 0, 0, 0, 0};
-    ASSERT_FALSE(line_def_zero3.is_valid());
-    ASSERT_THROW(line_def_zero3.point(), std::logic_error);
-    ASSERT_THROW(line_def_zero3.direction(), std::logic_error);
 
-    line_t line_def_zero4{4, 1, 3, 4, 1, 3};
-    ASSERT_FALSE(line_def_zero4.is_valid());
-    ASSERT_THROW(line_def_zero4.point(), std::logic_error);
-    ASSERT_THROW(line_def_zero4.direction(), std::logic_error);
+    ASSERT_THROW((line_t {0, 0, 0, 0, 0, 0}), std::logic_error);
+    ASSERT_THROW((line_t {4, 1, 3, 4, 1, 3}), std::logic_error);
 
     point_t p_zero_same{4, 1, 3};
-    line_t line_def_zero5{p_zero_same, p_zero_same};
-    ASSERT_FALSE(line_def_zero5.is_valid());
-    ASSERT_THROW(line_def_zero5.point(), std::logic_error);
-    ASSERT_THROW(line_def_zero5.direction(), std::logic_error);
+    ASSERT_THROW((line_t {p_zero_same, p_zero_same}), std::logic_error);
 }
 
 TEST_F(TestLine, InitValid) {
     line_t line1{4, 2, 3, 5, 0, 6};
-    ASSERT_TRUE(line1.is_valid());
-    ASSERT_TRUE(line1.point().is_valid());
     ASSERT_FALSE(line1.point().is_zero());
-    ASSERT_TRUE(line1.direction().is_valid());
     ASSERT_FALSE(line1.direction().is_zero());
 
     vec_t dir1{1, -2, 3};
@@ -66,18 +48,12 @@ TEST_F(TestLine, InitValid) {
     point_t p1{8, 4, 6};
     point_t p2{10, 0, 12};
     line_t line2{p1, p2};
-    ASSERT_TRUE(line2.is_valid());
-    ASSERT_TRUE(line2.point().is_valid());
     ASSERT_FALSE(line2.point().is_zero());
-    ASSERT_TRUE(line2.direction().is_valid());
     ASSERT_FALSE(line2.direction().is_zero());
     ASSERT_TRUE(line2.direction().collinear_with(dir1));
 
     line_t line3{p1, dir1};
-    ASSERT_TRUE(line3.is_valid());
-    ASSERT_TRUE(line3.point().is_valid());
     ASSERT_FALSE(line3.point().is_zero());
-    ASSERT_TRUE(line3.direction().is_valid());
     ASSERT_FALSE(line3.direction().is_zero());
     ASSERT_TRUE(line3.direction().collinear_with(dir1));
 }
@@ -166,12 +142,7 @@ TEST_F(TestLine, Equality) {
     ASSERT_TRUE((line_non_eq != line5) == (line5 != line_non_eq));
     ASSERT_FALSE(line_non_eq.direction().collinear_with(line5.direction()));
 
-    line_t line_invalid{4, 2, 3, 5, 0, nan<double>()};
-    ASSERT_FALSE(line_invalid.is_valid());
-    ASSERT_THROW(line_invalid == line1, std::logic_error);
-    ASSERT_THROW(line1 == line_invalid, std::logic_error);
-    ASSERT_THROW(line_invalid != line1, std::logic_error);
-    ASSERT_THROW(line1 != line_invalid, std::logic_error);
+    ASSERT_THROW((line_t {4, 2, 3, 5, 0, nan<double>()}), std::logic_error);
 }
 
 TEST_F(TestLine, Contains) {
@@ -186,9 +157,7 @@ TEST_F(TestLine, Contains) {
     ASSERT_FALSE(line.contains(point_t{0, 0, 0}));
     ASSERT_FALSE(line.contains(point_t{4, 3, 4}));
 
-    line_t line_invalid{p1, vec_t{0, 0, 0}};
-    ASSERT_FALSE(line_invalid.is_valid());
-    ASSERT_THROW(line_invalid.contains(p1), std::logic_error);
+    ASSERT_THROW((line_t {p1, vec_t{0, 0, 0}}), std::logic_error);
 }
 
 TEST_F(TestLine, ParallelLines) {
@@ -211,10 +180,8 @@ TEST_F(TestLine, ParallelLines) {
     ASSERT_FALSE(line3.parallel_to(line2));
     ASSERT_FALSE(line2.parallel_to(line3));
 
-    line_t line_invalid{p1, p1};
-    ASSERT_FALSE(line_invalid.is_valid());
-    ASSERT_THROW(line_invalid.parallel_to(line1), std::logic_error);
-    ASSERT_THROW(line1.parallel_to(line_invalid), std::logic_error);
+
+    ASSERT_THROW((line_t {p1, p1}), std::logic_error);
 }
 
 TEST_F(TestLine, PlaneIntersectionPoint) {
@@ -223,15 +190,13 @@ TEST_F(TestLine, PlaneIntersectionPoint) {
     point_t p3{1, 4, 1};
 
     plane_t plane1{p1, p2, p3};
-    ASSERT_TRUE(plane1.is_valid());
     
     point_t p1_perp2{-3, 3, 4};
     line_t line_perpendicular {p1, p1_perp2};
-    ASSERT_TRUE(line_perpendicular.is_valid());
     ASSERT_TRUE(line_perpendicular.intersection_point(plane1) == p1);
 
     line_t line_paral{p1, p2};
-    ASSERT_THROW(line_paral.intersection_point(plane1), std::logic_error);
+    ASSERT_THROW(line_paral.intersection_point(plane1), std::invalid_argument);
 
     point_t p2_perp2{-2, 5, 6};
     line_t line_seq{p2_perp2, p1};
@@ -241,7 +206,6 @@ TEST_F(TestLine, PlaneIntersectionPoint) {
     point_t p1_p2_perp2_mid{-0.5, 3.5, 4.5};
     point_t p3_perp1{-1, 4.5, 1.5};
     plane_t plane2{p1_perp1, p1_p2_perp2_mid, p3_perp1};
-    ASSERT_TRUE(plane2.is_valid());
 
     // std::cout << "Intersec point: " +
     // tr_t::plane_line_intersection_point(plane2, line_seq).to_string() + '\n';

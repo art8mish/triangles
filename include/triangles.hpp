@@ -30,8 +30,7 @@ public:
         SEGMENT, // one point is lying between two another (or
                  // two equal), after validation:
                  // line_ should be initialized
-        POINT,   // three points are equal
-        INVALID  // point is invalid
+        POINT    // three points are equal
     };
 
     const Point<T> &p1() const {
@@ -45,11 +44,11 @@ public:
     }
 
 private:
-    Kind kind_{Kind::INVALID};
+    Kind kind_;
 
     void validate() {
         if (!p1_.is_valid() || !p2_.is_valid() || !p3_.is_valid())
-            kind_ = Kind::INVALID;
+            throw std::logic_error(to_string() + " is not valid");
 
         else if (p1_ == p2_) {
             if (p2_ == p3_)
@@ -65,11 +64,6 @@ private:
             else
                 kind_ = Kind::TRIANGLE;
         }
-    }
-
-    void check_validity() const {
-        if (!is_valid())
-            throw std::logic_error(to_string() + " is not valid");
     }
 
     // rule: this should be in 2d
@@ -125,10 +119,7 @@ private:
         const auto [u, v] = plane.get_basis_vectors();
 
         const Triangle<T> this_2d = to_2d_(u, v, plane.point());
-        assert(this_2d.is_valid());
-
         const Triangle<T> other_2d = other.to_2d_(u, v, plane.point());
-        assert(other_2d.is_valid());
 
         if (!this_2d.triangle_normal_proj_intersection_2d_(other_2d))
             return false;
@@ -221,7 +212,6 @@ private:
         //std::cout << "Intersection:\n" << "This: " << to_string() << "\n" << "Other: " << other.to_string() << "\n";
 
         const Plane<T> this_plane = get_plane();
-        assert(this_plane.is_valid());
 
         if (!other.intersects_plane_(this_plane)) {
             //std::cout << "Other triangle does not intersects this plane\n";
@@ -229,7 +219,6 @@ private:
         }
         
         const Plane<T> other_plane = other.get_plane();
-        assert(other_plane.is_valid());
 
         if (this_plane == other_plane) {
             //std::cout << "Planes are equal\n";
@@ -242,7 +231,6 @@ private:
         }
 
         const Line<T> common_line{this_plane, other_plane};
-        assert(common_line.is_valid());
         //std::cout << "Common line:" << common_line.to_string() << "\n";
 
         //std::cout << "Counting this segment...\n";
@@ -263,8 +251,6 @@ private:
         assert(kind_ == Kind::TRIANGLE);
 
         Plane<T> plane = get_plane();
-        assert(plane.is_valid());
-
         if (!plane.contains(point))
             return false;
 
@@ -304,10 +290,7 @@ private:
         const auto [u, v] = plane.get_basis_vectors();
 
         const Triangle<T> this_2d = to_2d_(u, v, plane.point());
-        assert(this_2d.is_valid());
-
         const Triangle<T> other_2d = other.to_2d_(u, v, plane.point());
-        assert(other_2d.is_valid());
 
         return this_2d.triangle_normal_proj_intersection_2d_(other_2d);
     }
@@ -315,11 +298,9 @@ private:
     bool triangle_segment_intersection_(const Triangle<T> &other) const {
         assert(kind_ == Kind::TRIANGLE && other.kind_ == Kind::SEGMENT);
 
-        Plane<T> plane = get_plane();
-        assert(plane.is_valid());
+        Plane<T> plane = get_plane();;
         const Line<T> line = other.to_line();
 
-        assert(line.is_valid());
         if (plane.normal().orthogonal_to(line.direction())) {
             if (!plane.contains(line.point()))
                 return false;
@@ -416,12 +397,7 @@ public:
     }
 
     Triangle(const Point<T> &p1, const Point<T> &p2, const Point<T> &p3)
-        : p1_{p1}, p2_{p2}, p3_{p3} {
-        validate();
-    }
-
-    bool is_valid() const {
-        return kind_ != Kind::INVALID;
+        : Triangle(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, p3.x, p3.y, p3.z) {
     }
 
     Kind type() const {
@@ -429,9 +405,6 @@ public:
     }
 
     bool intersects(const Triangle<T> &other) const {
-        check_validity();
-        other.check_validity();
-
         if (kind_ == Kind::POINT) {
             if (other.kind_ == Kind::POINT)
                 return other.p1_ == p1_;

@@ -196,27 +196,27 @@ protected:
         tr_t seg2{p_2n, p_2n, p_end};
         tr_t seg3{p_3n, p_end, p_end};
 
-        EXPECT_EQ(seg1.type(), tr_t::Kind::SEGMENT) << context_msg;
-        EXPECT_EQ(seg2.type(), tr_t::Kind::SEGMENT) << context_msg;
-        EXPECT_EQ(seg3.type(), tr_t::Kind::SEGMENT) << context_msg;
+        ASSERT_EQ(seg1.type(), tr_t::Kind::SEGMENT) << context_msg;
+        ASSERT_EQ(seg2.type(), tr_t::Kind::SEGMENT) << context_msg;
+        ASSERT_EQ(seg3.type(), tr_t::Kind::SEGMENT) << context_msg;
 
-        EXPECT_EQ(sec, seg1.intersects(seg_a1)) << context_msg;
-        EXPECT_EQ(sec, seg_a1.intersects(seg1)) << context_msg;
+        ASSERT_EQ(sec, seg1.intersects(seg_a1)) << context_msg;
+        ASSERT_EQ(sec, seg_a1.intersects(seg1)) << context_msg;
 
         // paral
-        EXPECT_FALSE(seg1.intersects(seg_a3)) << context_msg;
-        EXPECT_FALSE(seg_a3.intersects(seg1)) << context_msg;
+        ASSERT_FALSE(seg1.intersects(seg_a3)) << context_msg;
+        ASSERT_FALSE(seg_a3.intersects(seg1)) << context_msg;
 
         // arbitrary
-        EXPECT_FALSE(seg2.intersects(seg_a3)) << context_msg;
-        EXPECT_FALSE(seg_a3.intersects(seg2)) << context_msg;
+        ASSERT_FALSE(seg2.intersects(seg_a3)) << context_msg;
+        ASSERT_FALSE(seg_a3.intersects(seg2)) << context_msg;
 
         // touch
-        EXPECT_EQ(contain_p1, seg3.intersects(seg_a3)) << context_msg;
-        EXPECT_EQ(contain_p1, seg_a3.intersects(seg3)) << context_msg;
+        ASSERT_EQ(contain_p1, seg3.intersects(seg_a3)) << context_msg;
+        ASSERT_EQ(contain_p1, seg_a3.intersects(seg3)) << context_msg;
 
-        EXPECT_EQ(contain_p2, seg3.intersects(seg_a1)) << context_msg;
-        EXPECT_EQ(contain_p2, seg_a1.intersects(seg3)) << context_msg;
+        ASSERT_EQ(contain_p2, seg3.intersects(seg_a1)) << context_msg;
+        ASSERT_EQ(contain_p2, seg_a1.intersects(seg3)) << context_msg;
     }
 
     void TriangleSegmentIntersection(const point_t &p_1n, const point_t &p_2n,
@@ -233,33 +233,33 @@ protected:
         tr_t seg2{p_2n, p_2n, p_end};
         tr_t seg3{p_3n, p_end, p_end};
 
-        EXPECT_EQ(seg1.type(), tr_t::Kind::SEGMENT) << context_msg;
-        EXPECT_EQ(seg2.type(), tr_t::Kind::SEGMENT) << context_msg;
-        EXPECT_EQ(seg3.type(), tr_t::Kind::SEGMENT) << context_msg;
+        ASSERT_EQ(seg1.type(), tr_t::Kind::SEGMENT) << context_msg;
+        ASSERT_EQ(seg2.type(), tr_t::Kind::SEGMENT) << context_msg;
+        ASSERT_EQ(seg3.type(), tr_t::Kind::SEGMENT) << context_msg;
 
         tr_t tr1{p_a11, p_a15, tr_p1};
         tr_t tr3{p_a31, p_a35, tr_p3};
 
-        EXPECT_EQ(tr1.type(), tr_t::Kind::TRIANGLE) << context_msg;
-        EXPECT_EQ(tr3.type(), tr_t::Kind::TRIANGLE) << context_msg;
+        ASSERT_EQ(tr1.type(), tr_t::Kind::TRIANGLE) << context_msg;
+        ASSERT_EQ(tr3.type(), tr_t::Kind::TRIANGLE) << context_msg;
 
-        EXPECT_EQ(sec, seg1.intersects(tr1)) << context_msg;
-        EXPECT_EQ(sec, tr1.intersects(seg1)) << context_msg;
+        ASSERT_EQ(sec, seg1.intersects(tr1)) << context_msg;
+        ASSERT_EQ(sec, tr1.intersects(seg1)) << context_msg;
 
         // paral
-        EXPECT_FALSE(seg1.intersects(tr3)) << context_msg;
-        EXPECT_FALSE(tr3.intersects(seg1)) << context_msg;
+        ASSERT_FALSE(seg1.intersects(tr3)) << context_msg;
+        ASSERT_FALSE(tr3.intersects(seg1)) << context_msg;
 
         // arbitrary
-        EXPECT_FALSE(seg2.intersects(tr3)) << context_msg;
-        EXPECT_FALSE(tr3.intersects(seg2)) << context_msg;
+        ASSERT_FALSE(seg2.intersects(tr3)) << context_msg;
+        ASSERT_FALSE(tr3.intersects(seg2)) << context_msg;
 
         // touch
-        EXPECT_EQ(contain_p_n, seg3.intersects(tr3)) << context_msg;
-        EXPECT_EQ(contain_p_n, tr3.intersects(seg3)) << context_msg;
+        ASSERT_EQ(contain_p_n, seg3.intersects(tr3)) << context_msg;
+        ASSERT_EQ(contain_p_n, tr3.intersects(seg3)) << context_msg;
 
-        EXPECT_EQ(contain_p_end, seg3.intersects(tr1)) << context_msg;
-        EXPECT_EQ(contain_p_end, tr1.intersects(seg3)) << context_msg;
+        ASSERT_EQ(contain_p_end, seg3.intersects(tr1)) << context_msg;
+        ASSERT_EQ(contain_p_end, tr1.intersects(seg3)) << context_msg;
     }
 
 
@@ -268,44 +268,44 @@ protected:
         context_msg += context;
         
         tr_t tr_in{src3, p_c13, p_b14};
-        EXPECT_EQ(tr_in.type(), tr_t::Kind::TRIANGLE) << context_msg;
+        ASSERT_EQ(tr_in.type(), tr_t::Kind::TRIANGLE) << context_msg;
 
-        EXPECT_TRUE(tr_main1.intersects(tr_in)) << context_msg;
-        EXPECT_TRUE(tr_in.intersects(tr_main1)) << context_msg;
-        EXPECT_TRUE(tr_main2.intersects(tr_in)) << context_msg;
-        EXPECT_TRUE(tr_in.intersects(tr_main2)) << context_msg;
+        ASSERT_TRUE(tr_main1.intersects(tr_in)) << context_msg;
+        ASSERT_TRUE(tr_in.intersects(tr_main1)) << context_msg;
+        ASSERT_TRUE(tr_main2.intersects(tr_in)) << context_msg;
+        ASSERT_TRUE(tr_in.intersects(tr_main2)) << context_msg;
 
         tr_t tr_touch_in{src3, p_c13, p_a14};
-        EXPECT_EQ(tr_touch_in.type(), tr_t::Kind::TRIANGLE) << context_msg;
+        ASSERT_EQ(tr_touch_in.type(), tr_t::Kind::TRIANGLE) << context_msg;
 
-        EXPECT_TRUE(tr_main1.intersects(tr_touch_in)) << context_msg;
-        EXPECT_TRUE(tr_touch_in.intersects(tr_main1)) << context_msg;
-        EXPECT_TRUE(tr_main2.intersects(tr_touch_in)) << context_msg;
-        EXPECT_TRUE(tr_touch_in.intersects(tr_main2)) << context_msg;
+        ASSERT_TRUE(tr_main1.intersects(tr_touch_in)) << context_msg;
+        ASSERT_TRUE(tr_touch_in.intersects(tr_main1)) << context_msg;
+        ASSERT_TRUE(tr_main2.intersects(tr_touch_in)) << context_msg;
+        ASSERT_TRUE(tr_touch_in.intersects(tr_main2)) << context_msg;
 
         tr_t tr_touch_out{src3, p_d3, p_a14};
-        EXPECT_EQ(tr_touch_out.type(), tr_t::Kind::TRIANGLE) << context_msg;
+        ASSERT_EQ(tr_touch_out.type(), tr_t::Kind::TRIANGLE) << context_msg;
 
-        EXPECT_TRUE(tr_main1.intersects(tr_touch_out)) << context_msg;
-        EXPECT_TRUE(tr_touch_out.intersects(tr_main1)) << context_msg;
-        EXPECT_TRUE(tr_main2.intersects(tr_touch_out)) << context_msg;
-        EXPECT_TRUE(tr_touch_out.intersects(tr_main2)) << context_msg;
+        ASSERT_TRUE(tr_main1.intersects(tr_touch_out)) << context_msg;
+        ASSERT_TRUE(tr_touch_out.intersects(tr_main1)) << context_msg;
+        ASSERT_TRUE(tr_main2.intersects(tr_touch_out)) << context_msg;
+        ASSERT_TRUE(tr_touch_out.intersects(tr_main2)) << context_msg;
 
         tr_t tr_side{src3, p_a13, p_a14};
-        EXPECT_EQ(tr_side.type(), tr_t::Kind::TRIANGLE) << context_msg;
+        ASSERT_EQ(tr_side.type(), tr_t::Kind::TRIANGLE) << context_msg;
 
-        EXPECT_TRUE(tr_main1.intersects(tr_side)) << context_msg;
-        EXPECT_TRUE(tr_side.intersects(tr_main1)) << context_msg;
-        EXPECT_TRUE(tr_main2.intersects(tr_side)) << context_msg;
-        EXPECT_TRUE(tr_side.intersects(tr_main2)) << context_msg;
+        ASSERT_TRUE(tr_main1.intersects(tr_side)) << context_msg;
+        ASSERT_TRUE(tr_side.intersects(tr_main1)) << context_msg;
+        ASSERT_TRUE(tr_main2.intersects(tr_side)) << context_msg;
+        ASSERT_TRUE(tr_side.intersects(tr_main2)) << context_msg;
 
         tr_t tr_out{src3, p_c17, p_e17};
-        EXPECT_EQ(tr_out.type(), tr_t::Kind::TRIANGLE);
+        ASSERT_EQ(tr_out.type(), tr_t::Kind::TRIANGLE);
 
-        EXPECT_FALSE(tr_main1.intersects(tr_out)) << context_msg;
-        EXPECT_FALSE(tr_out.intersects(tr_main1)) << context_msg;
-        EXPECT_FALSE(tr_main2.intersects(tr_out)) << context_msg;
-        EXPECT_FALSE(tr_out.intersects(tr_main2)) << context_msg;
+        ASSERT_FALSE(tr_main1.intersects(tr_out)) << context_msg;
+        ASSERT_FALSE(tr_out.intersects(tr_main1)) << context_msg;
+        ASSERT_FALSE(tr_main2.intersects(tr_out)) << context_msg;
+        ASSERT_FALSE(tr_out.intersects(tr_main2)) << context_msg;
     }
 
     void TriangleTriangleIntersectionCrossCase(const point_t &src1, const point_t &src3, 
@@ -313,20 +313,20 @@ protected:
         bool sec_src, bool sec_dst2, bool sec_dst3, const std::string &context = "") {
 
         tr_t tr2{src1, src3, dst2};
-        EXPECT_EQ(tr2.type(), tr_t::Kind::TRIANGLE) << context;
+        ASSERT_EQ(tr2.type(), tr_t::Kind::TRIANGLE) << context;
 
-        EXPECT_EQ(sec_src, tr_main1.intersects(tr2)) << context;
-        EXPECT_EQ(sec_src, tr2.intersects(tr_main1)) << context;
-        EXPECT_EQ(sec_src || sec_dst2, tr_main2.intersects(tr2)) << context;
-        EXPECT_EQ(sec_src || sec_dst2, tr2.intersects(tr_main2)) << context;
+        ASSERT_EQ(sec_src, tr_main1.intersects(tr2)) << context;
+        ASSERT_EQ(sec_src, tr2.intersects(tr_main1)) << context;
+        ASSERT_EQ(sec_src || sec_dst2, tr_main2.intersects(tr2)) << context;
+        ASSERT_EQ(sec_src || sec_dst2, tr2.intersects(tr_main2)) << context;
 
         tr_t tr3{src1, src3, dst3};
-        EXPECT_EQ(tr3.type(), tr_t::Kind::TRIANGLE) << context;
+        ASSERT_EQ(tr3.type(), tr_t::Kind::TRIANGLE) << context;
 
-        EXPECT_EQ(sec_src, tr_main1.intersects(tr3)) << context;
-        EXPECT_EQ(sec_src, tr3.intersects(tr_main1)) << context;
-        EXPECT_EQ(sec_src || sec_dst3, tr_main2.intersects(tr3)) << context;
-        EXPECT_EQ(sec_src || sec_dst3, tr3.intersects(tr_main2)) << context;
+        ASSERT_EQ(sec_src, tr_main1.intersects(tr3)) << context;
+        ASSERT_EQ(sec_src, tr3.intersects(tr_main1)) << context;
+        ASSERT_EQ(sec_src || sec_dst3, tr_main2.intersects(tr3)) << context;
+        ASSERT_EQ(sec_src || sec_dst3, tr3.intersects(tr_main2)) << context;
     }
 
     void TriangleTriangleIntersectionCross(const point_t &src1, const point_t &src3, bool sec_src, const std::string &context = "") {
@@ -352,38 +352,38 @@ protected:
         tr_t tr2_2{tr2_p1, tr3_p2, tr2_p3};
         tr_t tr2_3{tr2_p1, tr2_p2, tr3_p3};
 
-        EXPECT_EQ(tr2.type(), tr_t::Kind::TRIANGLE) << context;
-        EXPECT_EQ(tr2_1.type(), tr_t::Kind::TRIANGLE) << context;
-        EXPECT_EQ(tr2_2.type(), tr_t::Kind::TRIANGLE) << context;
-        EXPECT_EQ(tr2_3.type(), tr_t::Kind::TRIANGLE) << context;
+        ASSERT_EQ(tr2.type(), tr_t::Kind::TRIANGLE) << context;
+        ASSERT_EQ(tr2_1.type(), tr_t::Kind::TRIANGLE) << context;
+        ASSERT_EQ(tr2_2.type(), tr_t::Kind::TRIANGLE) << context;
+        ASSERT_EQ(tr2_3.type(), tr_t::Kind::TRIANGLE) << context;
 
-        EXPECT_FALSE(tr_main1.intersects(tr2)) << context;
-        EXPECT_FALSE(tr2.intersects(tr_main1)) << context;
-        EXPECT_FALSE(tr_main1.intersects(tr2_1)) << context;
-        EXPECT_FALSE(tr2_1.intersects(tr_main1)) << context;
-        EXPECT_FALSE(tr_main1.intersects(tr2_2)) << context;
-        EXPECT_FALSE(tr2_2.intersects(tr_main1)) << context;
-        EXPECT_FALSE(tr_main1.intersects(tr2_3)) << context;
-        EXPECT_FALSE(tr2_3.intersects(tr_main1)) << context;
+        ASSERT_FALSE(tr_main1.intersects(tr2)) << context;
+        ASSERT_FALSE(tr2.intersects(tr_main1)) << context;
+        ASSERT_FALSE(tr_main1.intersects(tr2_1)) << context;
+        ASSERT_FALSE(tr2_1.intersects(tr_main1)) << context;
+        ASSERT_FALSE(tr_main1.intersects(tr2_2)) << context;
+        ASSERT_FALSE(tr2_2.intersects(tr_main1)) << context;
+        ASSERT_FALSE(tr_main1.intersects(tr2_3)) << context;
+        ASSERT_FALSE(tr2_3.intersects(tr_main1)) << context;
 
         tr_t tr3{tr3_p1, tr3_p2, tr3_p3};
         tr_t tr3_1{tr2_p1, tr3_p2, tr3_p3};
         tr_t tr3_2{tr3_p1, tr2_p2, tr3_p3};
         tr_t tr3_3{tr3_p1, tr3_p2, tr2_p3};
 
-        EXPECT_EQ(tr3.type(), tr_t::Kind::TRIANGLE) << context;
-        EXPECT_EQ(tr3_1.type(), tr_t::Kind::TRIANGLE) << context;
-        EXPECT_EQ(tr3_2.type(), tr_t::Kind::TRIANGLE) << context;
-        EXPECT_EQ(tr3_3.type(), tr_t::Kind::TRIANGLE) << context;
+        ASSERT_EQ(tr3.type(), tr_t::Kind::TRIANGLE) << context;
+        ASSERT_EQ(tr3_1.type(), tr_t::Kind::TRIANGLE) << context;
+        ASSERT_EQ(tr3_2.type(), tr_t::Kind::TRIANGLE) << context;
+        ASSERT_EQ(tr3_3.type(), tr_t::Kind::TRIANGLE) << context;
 
-        EXPECT_FALSE(tr_main1.intersects(tr3)) << context;
-        EXPECT_FALSE(tr3.intersects(tr_main1)) << context;
-        EXPECT_FALSE(tr_main1.intersects(tr3_1)) << context;
-        EXPECT_FALSE(tr3_1.intersects(tr_main1)) << context;
-        EXPECT_FALSE(tr_main1.intersects(tr3_2)) << context;
-        EXPECT_FALSE(tr3_2.intersects(tr_main1)) << context;
-        EXPECT_FALSE(tr_main1.intersects(tr3_3)) << context;
-        EXPECT_FALSE(tr3_3.intersects(tr_main1)) << context;
+        ASSERT_FALSE(tr_main1.intersects(tr3)) << context;
+        ASSERT_FALSE(tr3.intersects(tr_main1)) << context;
+        ASSERT_FALSE(tr_main1.intersects(tr3_1)) << context;
+        ASSERT_FALSE(tr3_1.intersects(tr_main1)) << context;
+        ASSERT_FALSE(tr_main1.intersects(tr3_2)) << context;
+        ASSERT_FALSE(tr3_2.intersects(tr_main1)) << context;
+        ASSERT_FALSE(tr_main1.intersects(tr3_3)) << context;
+        ASSERT_FALSE(tr3_3.intersects(tr_main1)) << context;
     }
 };
 
@@ -396,47 +396,35 @@ TEST_F(TestTriangles, InitCustom) {
 
 TEST_F(TestTriangles, InitInvalid) {
     point_t p_invalid{1, 2, nan<double>()};
-
-    tr_t triangle{p_zero, p_invalid, p_a11};
-    ASSERT_FALSE(triangle.is_valid());
+    ASSERT_THROW((tr_t {p_zero, p_invalid, p_a11}), std::logic_error);
 }
 
 TEST_F(TestTriangles, InitValid) {
-    ASSERT_TRUE(tr_main1.is_valid());
-    EXPECT_EQ(tr_main1.type(), tr_t::Kind::TRIANGLE);
-
-    ASSERT_TRUE(tr_main2.is_valid());
-    EXPECT_EQ(tr_main2.type(), tr_t::Kind::TRIANGLE);
+    ASSERT_EQ(tr_main1.type(), tr_t::Kind::TRIANGLE);
+    ASSERT_EQ(tr_main2.type(), tr_t::Kind::TRIANGLE);
 
     tr_t tr1{p_zero, p_a11, p_b11};
-    ASSERT_TRUE(tr1.is_valid());
     ASSERT_EQ(tr1.type(), tr_t::Kind::TRIANGLE);
 
     tr_t tr2{p_b11, p_a11, p_zero};
-    ASSERT_TRUE(tr2.is_valid());
     ASSERT_EQ(tr2.type(), tr_t::Kind::TRIANGLE);
 
     ASSERT_EQ(seg_a1.type(), tr_t::Kind::SEGMENT);
     ASSERT_EQ(seg_a3.type(), tr_t::Kind::SEGMENT);
 
     tr_t tr_seg1{p_a11, p_a12, p_a13};
-    ASSERT_TRUE(tr_seg1.is_valid());
     ASSERT_EQ(tr_seg1.type(), tr_t::Kind::SEGMENT);
 
     tr_t tr_seg2{p_zero, p_zero, p_a11};
-    ASSERT_TRUE(tr_seg2.is_valid());
     ASSERT_EQ(tr_seg2.type(), tr_t::Kind::SEGMENT);
 
     tr_t tr_seg3{p_a11, p_zero, p_a11};
-    ASSERT_TRUE(tr_seg3.is_valid());
     ASSERT_EQ(tr_seg3.type(), tr_t::Kind::SEGMENT);
 
     tr_t tr_seg4{p_a11, p_a12, p_a12};
-    ASSERT_TRUE(tr_seg4.is_valid());
     ASSERT_EQ(tr_seg4.type(), tr_t::Kind::SEGMENT);
 
     tr_t tr_p3{p_a11, p_a11, p_a11};
-    ASSERT_TRUE(tr_p3.is_valid());
     ASSERT_EQ(tr_p3.type(), tr_t::Kind::POINT);
 }
 
@@ -836,60 +824,60 @@ TEST_F(TestTriangles, IntersectionTriangleSegmentPerpendicularSecOut) {
 
 TEST_F(TestTriangles, IntersectionTriangleTriangle2D) {
     tr_t tr1{p_a12, p_a15, p_c13};
-    EXPECT_EQ(tr1.type(), tr_t::Kind::TRIANGLE);
-    EXPECT_TRUE(tr1.intersects(tr1));
+    ASSERT_EQ(tr1.type(), tr_t::Kind::TRIANGLE);
+    ASSERT_TRUE(tr1.intersects(tr1));
 
     tr_t tr2{p_c11, p_c12, p_b15};
-    EXPECT_EQ(tr2.type(), tr_t::Kind::TRIANGLE);
+    ASSERT_EQ(tr2.type(), tr_t::Kind::TRIANGLE);
 
-    EXPECT_TRUE(tr1.intersects(tr2));
-    EXPECT_TRUE(tr2.intersects(tr1));
+    ASSERT_TRUE(tr1.intersects(tr2));
+    ASSERT_TRUE(tr2.intersects(tr1));
 
     tr_t tr3{p_c12, p_e12, p_d3};
-    EXPECT_EQ(tr3.type(), tr_t::Kind::TRIANGLE);
+    ASSERT_EQ(tr3.type(), tr_t::Kind::TRIANGLE);
 
-    EXPECT_TRUE(tr1.intersects(tr3));
-    EXPECT_TRUE(tr3.intersects(tr1));
+    ASSERT_TRUE(tr1.intersects(tr3));
+    ASSERT_TRUE(tr3.intersects(tr1));
 
     tr_t tr4{p_a15, p_a17, p_c14};
-    EXPECT_EQ(tr4.type(), tr_t::Kind::TRIANGLE);
+    ASSERT_EQ(tr4.type(), tr_t::Kind::TRIANGLE);
 
-    EXPECT_TRUE(tr1.intersects(tr4));
-    EXPECT_TRUE(tr4.intersects(tr1));
+    ASSERT_TRUE(tr1.intersects(tr4));
+    ASSERT_TRUE(tr4.intersects(tr1));
 
     tr_t tr5{p_a16, p_a17, p_c14};
-    EXPECT_EQ(tr5.type(), tr_t::Kind::TRIANGLE);
+    ASSERT_EQ(tr5.type(), tr_t::Kind::TRIANGLE);
 
-    EXPECT_FALSE(tr1.intersects(tr5));
-    EXPECT_FALSE(tr5.intersects(tr1));
+    ASSERT_FALSE(tr1.intersects(tr5));
+    ASSERT_FALSE(tr5.intersects(tr1));
 
     tr_t tr6{p_d1, p_d6, p_e13};
-    EXPECT_EQ(tr6.type(), tr_t::Kind::TRIANGLE);
+    ASSERT_EQ(tr6.type(), tr_t::Kind::TRIANGLE);
 
-    EXPECT_TRUE(tr1.intersects(tr6));
-    EXPECT_TRUE(tr6.intersects(tr1));
+    ASSERT_TRUE(tr1.intersects(tr6));
+    ASSERT_TRUE(tr6.intersects(tr1));
 
     tr_t tr7{p_d2, p_d5, p_b13};
-    EXPECT_EQ(tr7.type(), tr_t::Kind::TRIANGLE);
+    ASSERT_EQ(tr7.type(), tr_t::Kind::TRIANGLE);
 
-    EXPECT_TRUE(tr1.intersects(tr7));
-    EXPECT_TRUE(tr7.intersects(tr1));
+    ASSERT_TRUE(tr1.intersects(tr7));
+    ASSERT_TRUE(tr7.intersects(tr1));
 
 
     tr_t tr8{p_a12, p_a15, p_c15};
-    EXPECT_EQ(tr6.type(), tr_t::Kind::TRIANGLE);
+    ASSERT_EQ(tr6.type(), tr_t::Kind::TRIANGLE);
 
     tr_t tr9{p_a13, p_c13, p_e11};
-    EXPECT_EQ(tr8.type(), tr_t::Kind::TRIANGLE);
+    ASSERT_EQ(tr8.type(), tr_t::Kind::TRIANGLE);
 
-    EXPECT_TRUE(tr8.intersects(tr9));
-    EXPECT_TRUE(tr9.intersects(tr8));
+    ASSERT_TRUE(tr8.intersects(tr9));
+    ASSERT_TRUE(tr9.intersects(tr8));
 
     tr_t tr10{p_b11, p_b14, p_e14};
-    EXPECT_EQ(tr9.type(), tr_t::Kind::TRIANGLE);
+    ASSERT_EQ(tr9.type(), tr_t::Kind::TRIANGLE);
 
-    EXPECT_TRUE(tr8.intersects(tr10));
-    EXPECT_TRUE(tr10.intersects(tr8));    
+    ASSERT_TRUE(tr8.intersects(tr10));
+    ASSERT_TRUE(tr10.intersects(tr8));    
 }
 
 TEST_F(TestTriangles, IntersectionTriangleTriangle3D_Parallel) {

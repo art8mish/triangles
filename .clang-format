@@ -22,4 +22,4 @@ AllowShortLoopsOnASingleLine: False
 # public: ...
 AccessModifierOffset: -4
 
-ColumnLimit: 80
+ColumnLimit: 100

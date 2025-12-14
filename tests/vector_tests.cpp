@@ -25,69 +25,55 @@ protected:
 
 TEST_F(TestVector, Init) {
     vec_t vec_def_zero1{};
-    ASSERT_TRUE(vec_def_zero1.is_valid());
     ASSERT_TRUE(vec_def_zero1.is_zero());
 
     vec_t vec_delta{16.2, 7.56, 0.0};
-    ASSERT_TRUE(vec_delta.is_valid());
     ASSERT_FALSE(vec_delta.is_zero());
 
     point_t p_from = {0.0, 0.0, 0.0};
     point_t p_to = {16.2, 7.56, -15.3};
     vec_t vec_points{p_from, p_to};
-    ASSERT_TRUE(vec_points.is_valid());
     ASSERT_FALSE(vec_points.is_zero());
 
     vec_t vec_nums{0, 25.4, 6.7, 15.4, 94.3, 2.4};
-    ASSERT_TRUE(vec_nums.is_valid());
     ASSERT_FALSE(vec_nums.is_zero());
 }
 
 TEST_F(TestVector, IsZero) {
     vec_t vec_def_zero1{};
-    ASSERT_TRUE(vec_def_zero1.is_valid());
     ASSERT_TRUE(vec_def_zero1.is_zero());
 
     vec_t vec_zero_delta{0.0, 0.0, 0.0};
-    ASSERT_TRUE(vec_zero_delta.is_valid());
     ASSERT_TRUE(vec_zero_delta.is_zero());
 
     point_t p_zero_from = {0.0, 0.0, 0.0};
     point_t p_zero_to = {-0.0, 0.0, 0};
     vec_t vec_zero_points{p_zero_from, p_zero_to};
-    ASSERT_TRUE(vec_zero_points.is_valid());
     ASSERT_TRUE(vec_zero_points.is_zero());
 
     vec_t vec_zero_nums{0.0, 0.0, 0, 0.0, 0, 0};
-    ASSERT_TRUE(vec_zero_nums.is_valid());
     ASSERT_TRUE(vec_zero_nums.is_zero());
 
     vec_t vec_not_zero{0.01, 0.0, 0.0};
-    ASSERT_TRUE(vec_not_zero.is_valid());
     ASSERT_FALSE(vec_not_zero.is_zero());
 }
 
 TEST_F(TestVector, LowDimensions) {
     vec_t vec_2d_1{16.2, 7.56};
-    ASSERT_TRUE(vec_2d_1.is_valid());
     ASSERT_FALSE(vec_2d_1.is_zero());
 
     vec_t vec_2d_2{16.2, 7.56, 0.0};
-    ASSERT_TRUE(vec_2d_2.is_valid());
     ASSERT_FALSE(vec_2d_2.is_zero());
 
     ASSERT_TRUE(vec_2d_1 == vec_2d_2);
 
     vec_t vec_1d_1{0.001};
-    ASSERT_TRUE(vec_1d_1.is_valid());
     ASSERT_FALSE(vec_1d_1.is_zero());
 
     vec_t vec_1d_2{0.001, 0.0};
-    ASSERT_TRUE(vec_1d_2.is_valid());
     ASSERT_FALSE(vec_1d_2.is_zero());
 
     vec_t vec_1d_3{0.001, 0.0, 0.0};
-    ASSERT_TRUE(vec_1d_3.is_valid());
     ASSERT_FALSE(vec_1d_3.is_zero());
 
     ASSERT_TRUE(vec_1d_1 == vec_1d_2);
@@ -176,9 +162,7 @@ TEST_F(TestVector, Enorm) {
     vec_t vec_valid{1, -2, 3};
     ASSERT_TRUE(equal<double>(vec_valid.enorm(), std::sqrt(14), eps_));
 
-    vec_t vec_invalid{1, 2, nan<double>()};
-    ASSERT_FALSE(vec_invalid.is_valid());
-    ASSERT_THROW(vec_invalid.enorm(), std::logic_error);
+    ASSERT_THROW((vec_t {1, 2, nan<double>()}), std::logic_error);
 }
 
 TEST_F(TestVector, Edot) {
@@ -277,12 +261,9 @@ TEST_F(TestVector, Normalization) {
     vec_t vec_normalized2{0, 1, 0};
     ASSERT_TRUE(vec_normalized2.is_normalized());
 
-    vec_t vec_invalid{1, 2, nan<double>()};
-    ASSERT_FALSE(vec_invalid.is_valid());
-    ASSERT_THROW(vec_invalid.is_normalized(), std::logic_error);
+    ASSERT_THROW((vec_t {1, 2, nan<double>()}), std::logic_error);
 
     vec_t vec_zero{};
-    std::cout << vec_zero.to_string() << "\n";
     ASSERT_TRUE(vec_zero.is_zero());
     ASSERT_FALSE(vec_zero.is_normalized());
 
@@ -300,8 +281,6 @@ TEST_F(TestVector, Normalization) {
 
     vec_t vec_rval = (vec_t{1, 2, 3}).normalize();
     ASSERT_TRUE(vec_rval.is_normalized());
-
-    ASSERT_THROW(vec_invalid.normalize(), std::logic_error);
     ASSERT_NO_THROW(vec_zero.normalize());
 }
 
@@ -331,36 +310,5 @@ TEST_F(TestVector, GetPerpendicular) {
 }
 
 TEST_F(TestVector, InvalidStateExceptions) {
-    vec_t vec_invalid{1, 2, nan<double>()};
-    ASSERT_FALSE(vec_invalid.is_valid());
-
-    ASSERT_THROW(vec_invalid.is_zero(), std::logic_error);
-
-    ASSERT_THROW(vec_invalid.x(), std::logic_error);
-    ASSERT_THROW(vec_invalid.y(), std::logic_error);
-    ASSERT_THROW(vec_invalid.z(), std::logic_error);
-
-    ASSERT_THROW(vec_invalid.normalize(), std::logic_error);
-    ASSERT_THROW(vec_invalid.get_perpendicular(), std::logic_error);
-
-    vec_t vec_valid{1, 2, 3};
-    ASSERT_TRUE(vec_valid.is_valid());
-
-    ASSERT_THROW(vec_valid == vec_invalid, std::logic_error);
-    ASSERT_THROW(vec_invalid == vec_valid, std::logic_error);
-
-    ASSERT_THROW(vec_valid != vec_invalid, std::logic_error);
-    ASSERT_THROW(vec_invalid != vec_valid, std::logic_error);
-
-    ASSERT_THROW(vec_valid.edot(vec_invalid), std::logic_error);
-    ASSERT_THROW(vec_invalid.edot(vec_valid), std::logic_error);
-
-    ASSERT_THROW(vec_valid.ecross(vec_invalid), std::logic_error);
-    ASSERT_THROW(vec_invalid.ecross(vec_valid), std::logic_error);
-
-    ASSERT_THROW(vec_valid.collinear_with(vec_invalid), std::logic_error);
-    ASSERT_THROW(vec_invalid.collinear_with(vec_valid), std::logic_error);
-
-    ASSERT_THROW(vec_valid.orthogonal_to(vec_invalid), std::logic_error);
-    ASSERT_THROW(vec_invalid.orthogonal_to(vec_valid), std::logic_error);
+    ASSERT_THROW((vec_t {1, 2, nan<double>()}), std::logic_error);
 }

@@ -1,38 +1,82 @@
 
-#include "../include/triangles.hpp"
 #include <ctime>
+#include <iostream>
 #include <vector>
 
+#include "../include/triangles.hpp"
+#include "../include/octo_tree.hpp"
+
+double get_coordinate() {
+    double coord = std::numeric_limits<double>::quiet_NaN();
+    std::cin >> coord;
+    if (!std::cin.good())
+        throw std::invalid_argument("Incorrect coordinate");
+    return coord;
+}
+
 int main() {
-    // unsigned triangles_amount = 0;
-    // std::cin >> triangles_amount;
+    try {
+        size_t size = 0;
+        std::cin >> size;
+        if (!std::cin.good()) {
+            std::cout << "Error: incorrect size" << std::endl;
+            return 1;
+        }
 
-    // #ifndef NDEBUG
-    // std::cout << "Triangles" << std::endl;
-    // std::cout << "triangles amount: "  << triangles_amount << std::endl;
-    // std::cout << "intersections: ";
+#ifndef NDEBUG
+        auto start_time = std::clock();
+#endif
+        std::vector<triangles::Triangle<double>> triangles{};
+        triangles.reserve(size);
 
-    // auto start_time = std::clock();
-    // #endif
+        double coord_range = 0;
+        const size_t tr_coord_amount = 9;
+        for (unsigned i = 0; i < size; i++) {
+            std::array<double, tr_coord_amount> coordinates {};
+            for (size_t i =0; i < tr_coord_amount; ++i) {
+                double coord = get_coordinate();
+                double abs = std::abs(coord);
+                if (abs > coord_range)
+                    coord_range = abs;
+                coordinates[i] = coord;
+            }
+            triangles::Triangle<double> triangle {coordinates[0],
+                coordinates[1],
+                coordinates[2],
+                coordinates[3],
+                coordinates[4],
+                coordinates[5],
+                coordinates[6],
+                coordinates[7],
+                coordinates[8]
+            };
+            triangles.push_back(triangle);
+        }      
+        
+        triangles::OctoTree<double> tree{coord_range};
+        for (auto &triangle : triangles) {
+            tree.add_triangle(std::move(triangle));
+        }
+        std::set<size_t> intersections = tree.intersections();
+        for (auto sec : intersections)
+            std::cout << sec << "\n";
 
-    // std::vector<triangles::Point<double>> triangles {};
-    // for (unsigned i = 0; i < triangles_amount; i++) {
-    //     double x = 0, y = 0, z = 0;
-    //     std::cin >> x >> y >> z;
-    //     auto point = triangles::Point<double>{x, y, z}
-    //     triangles.push_back(point);
-    // }
-
-    // for (unsigned& key : keys)
-    //     cache.proc_page(key);
-
-    // std::cout <<  cache.hits() << std::endl;
-    // //std::cout << "runtime = " << std::clock()/1000.0 << std::endl;
-
-    // #ifdef DEBUG
-    // auto duration = std::clock() - start_time;
-    // std::cout << "runtime: " << duration << " us" << std::endl;
-    // #endif
-
-    return 0;
+#ifndef NDEBUG
+        auto duration = std::clock() - start_time;
+        std::cout << "runtime: " << duration << " us" << std::endl;
+#endif
+        return 0;
+    } catch (const std::invalid_argument& e) {
+        std::cout << "Invalid argument: " << e.what() <<std::endl;
+        return 1;
+    } catch (const std::out_of_range& e) {
+        std::cout << "Triangle is out of tree range: " << e.what() <<std::endl;
+        return 1;
+    } catch (const std::exception& e) {
+        std::cout << "Error: " << e.what() << std::endl;
+        return 1;
+    } catch (...) {
+        std::cout << "Unknown error" <<  std::endl;
+        return 1;
+    }
 }

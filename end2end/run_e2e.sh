@@ -32,12 +32,12 @@ done
 
 # Automatic binary search, if it is not specified
 if [ -z "$triag_bin" ]; then
-    if [ -f "$project_root/build/triag" ]; then
-        triag_bin="$project_root/build/triag"
-    elif [ -f "./triag" ]; then
-        triag_bin="./triag"
+    if [ -f "$project_root/build/triangles" ]; then
+        triag_bin="$project_root/build/triangles"
+    elif [ -f "./triangles" ]; then
+        triag_bin="./triangles"
     else
-        echo "ERROR: 'triag' binary not found. Options:"
+        echo "ERROR: 'triangles' binary not found. Options:"
         echo "1. Use -b to specify path"
         echo "2. Set TRIAG_BIN environment variable"
         rm -f "$temp_result"
