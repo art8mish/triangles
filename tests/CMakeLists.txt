@@ -2,9 +2,6 @@ enable_testing()
 find_package(GTest REQUIRED) 
 include(GoogleTest)
 
-set(LFUC_SRC ${CMAKE_CURRENT_SOURCE_DIR} / lfuc_tests.cpp) 
-set(PC_SRC ${CMAKE_CURRENT_SOURCE_DIR} / pc_tests.cpp)
-
 function(add_proj_test target) 
     add_executable(${target} ${ARGN})
     target_include_directories(${target} PRIVATE ${INCLUDE_DIR})
