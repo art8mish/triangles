@@ -42,7 +42,7 @@ cmake --build build
 ./build/triangles
 ```
 
-Запуск на примерах из папки `./data`:
+Запуск на примерах из папки `./end2end`:
 ```bash
 ./build/triangles < ./end2end/tests/test1.txt
 ```
