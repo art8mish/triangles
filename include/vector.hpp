@@ -3,14 +3,14 @@
 #include <cmath>
 #include <concepts>
 #include <limits>
-#include <string>
 #include <stdexcept>
+#include <string>
 
 #include "point.hpp"
 #include "utils.hpp"
 
 namespace triangles {
-template <std::floating_point T> class Vector {
+template <std::floating_point T> class Vector final {
     T eps_{epsilon<T>()};
 
     T dx_{0};
@@ -26,28 +26,22 @@ public:
     Vector(T dx, T dy, T dz) : dx_{dx}, dy_{dy}, dz_{dz} {
         validate();
     }
-    Vector(T dx, T dy) : Vector(dx, dy, 0) {
-    }
-    explicit Vector(T dx) : Vector(dx, 0, 0) {
-    }
-    Vector() : Vector(0, 0, 0) {
-    }
+    Vector(T dx, T dy) : Vector(dx, dy, 0) {}
+    explicit Vector(T dx) : Vector(dx, 0, 0) {}
+    Vector() : Vector(0, 0, 0) {}
 
-    Vector(const Point<T> &p) : Vector(p.x, p.y, p.z) {
-    }
+    Vector(const Point<T> &p) : Vector(p.x, p.y, p.z) {}
 
     Vector(T from_x, T from_y, T from_z, T to_x, T to_y, T to_z)
-        : Vector(to_x - from_x, to_y - from_y, to_z - from_z) {
-    }
+        : Vector(to_x - from_x, to_y - from_y, to_z - from_z) {}
 
     Vector(const Point<T> &from, const Point<T> &to)
-        : Vector(from.x, from.y, from.z, to.x, to.y, to.z) {
-    }
+        : Vector(from.x, from.y, from.z, to.x, to.y, to.z) {}
 
     const T &x() const & {
         return dx_;
     }
-    const T &y() const & {
+    final const T &y() const & {
 
         return dy_;
     }
@@ -80,21 +74,14 @@ public:
     T edot(const Vector<T> &other) const {
         return dx_ * other.dx_ + dy_ * other.dy_ + dz_ * other.dz_;
     }
-    
+
     Vector<T> ecross(const Vector<T> &other) const {
-        return Vector<T>{dy_ * other.dz_ - dz_ * other.dy_,
-                         dz_ * other.dx_ - dx_ * other.dz_,
+        return Vector<T>{dy_ * other.dz_ - dz_ * other.dy_, dz_ * other.dx_ - dx_ * other.dz_,
                          dx_ * other.dy_ - dy_ * other.dx_};
     }
 
     bool collinear_with(const Vector<T> &other) const {
         return ecross(other).is_zero();
-
-        // T k_x = dx_ / other.dx_;
-        // T k_y = dy_ / other.dy_;
-        // T k_z = dz_ / other.dz_;
-        // return equal<T>(k_x, k_y, eps_)
-        //     && equal<T>(k_y, k_z, eps_);
     }
 
     bool orthogonal_to(const Vector<T> &other) const {
@@ -136,8 +123,8 @@ public:
     }
 
     std::string to_string() const {
-        return "Vec(" + std::to_string(dx_) + ", " + std::to_string(dy_) +
-               ", " + std::to_string(dz_) + ")";
+        return "Vec(" + std::to_string(dx_) + ", " + std::to_string(dy_) + ", " +
+               std::to_string(dz_) + ")";
     }
 };
 } // namespace triangles

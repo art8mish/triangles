@@ -10,7 +10,7 @@
 #include "vector.hpp"
 
 namespace triangles {
-template <std::floating_point T> class Plane {
+template <std::floating_point T> class Plane final {
     // L: (n_, r - p_) = 0
 
     Point<T> p_{};
@@ -27,8 +27,7 @@ public:
     }
 
     Plane(const Point<T> &p1, const Point<T> &p2, const Point<T> &p3)
-        : Plane(p1, Vector<T>{p1, p2}.ecross(Vector<T>{p1, p3}).normalize()) {
-    }
+        : Plane(p1, Vector<T>{p1, p2}.ecross(Vector<T>{p1, p3}).normalize()) {}
 
     const Vector<T> &normal() const & {
         return n_;
@@ -72,8 +71,7 @@ public:
     }
 
     std::string to_string() const {
-        return "Plane((" + n_.to_string() + ", (x, y, z) -" + p_.to_string() +
-               ") = 0";
+        return "Plane((" + n_.to_string() + ", (x, y, z) -" + p_.to_string() + ") = 0";
     }
 };
 } // namespace triangles

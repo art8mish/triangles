@@ -1,7 +1,7 @@
 
 #include <fstream>
-#include <stdexcept>
 #include <gtest/gtest.h>
+#include <stdexcept>
 
 #include "line.hpp"
 #include "point.hpp"
@@ -24,17 +24,16 @@ protected:
 TEST_F(TestLine, InitZero) {
     point_t p_zero1{};
     point_t p_zero2{};
-    ASSERT_THROW((line_t {p_zero1, p_zero2}), std::logic_error);
+    ASSERT_THROW((line_t{p_zero1, p_zero2}), std::logic_error);
 
     vec_t vec_zero{};
-    ASSERT_THROW((line_t {p_zero1, vec_zero}), std::logic_error);
+    ASSERT_THROW((line_t{p_zero1, vec_zero}), std::logic_error);
 
-
-    ASSERT_THROW((line_t {0, 0, 0, 0, 0, 0}), std::logic_error);
-    ASSERT_THROW((line_t {4, 1, 3, 4, 1, 3}), std::logic_error);
+    ASSERT_THROW((line_t{0, 0, 0, 0, 0, 0}), std::logic_error);
+    ASSERT_THROW((line_t{4, 1, 3, 4, 1, 3}), std::logic_error);
 
     point_t p_zero_same{4, 1, 3};
-    ASSERT_THROW((line_t {p_zero_same, p_zero_same}), std::logic_error);
+    ASSERT_THROW((line_t{p_zero_same, p_zero_same}), std::logic_error);
 }
 
 TEST_F(TestLine, InitValid) {
@@ -142,7 +141,7 @@ TEST_F(TestLine, Equality) {
     ASSERT_TRUE((line_non_eq != line5) == (line5 != line_non_eq));
     ASSERT_FALSE(line_non_eq.direction().collinear_with(line5.direction()));
 
-    ASSERT_THROW((line_t {4, 2, 3, 5, 0, nan<double>()}), std::logic_error);
+    ASSERT_THROW((line_t{4, 2, 3, 5, 0, nan<double>()}), std::logic_error);
 }
 
 TEST_F(TestLine, Contains) {
@@ -157,7 +156,7 @@ TEST_F(TestLine, Contains) {
     ASSERT_FALSE(line.contains(point_t{0, 0, 0}));
     ASSERT_FALSE(line.contains(point_t{4, 3, 4}));
 
-    ASSERT_THROW((line_t {p1, vec_t{0, 0, 0}}), std::logic_error);
+    ASSERT_THROW((line_t{p1, vec_t{0, 0, 0}}), std::logic_error);
 }
 
 TEST_F(TestLine, ParallelLines) {
@@ -180,8 +179,7 @@ TEST_F(TestLine, ParallelLines) {
     ASSERT_FALSE(line3.parallel_to(line2));
     ASSERT_FALSE(line2.parallel_to(line3));
 
-
-    ASSERT_THROW((line_t {p1, p1}), std::logic_error);
+    ASSERT_THROW((line_t{p1, p1}), std::logic_error);
 }
 
 TEST_F(TestLine, PlaneIntersectionPoint) {
@@ -190,9 +188,9 @@ TEST_F(TestLine, PlaneIntersectionPoint) {
     point_t p3{1, 4, 1};
 
     plane_t plane1{p1, p2, p3};
-    
+
     point_t p1_perp2{-3, 3, 4};
-    line_t line_perpendicular {p1, p1_perp2};
+    line_t line_perpendicular{p1, p1_perp2};
     ASSERT_TRUE(line_perpendicular.intersection_point(plane1) == p1);
 
     line_t line_paral{p1, p2};

@@ -6,8 +6,7 @@
 #include <utility>
 
 namespace triangles {
-template <std::floating_point T> 
-T epsilon() {
+template <std::floating_point T> T epsilon() {
     if (std::is_same_v<T, double>)
         return 1e-9;
     else if (std::is_same_v<T, long double>)
@@ -33,8 +32,7 @@ template <std::floating_point T> T inf() {
 //         return 0.0f;
 // }
 
-template <std::floating_point T>
-bool equal(const T &num1, const T &num2, const T &eps) {
+template <std::floating_point T> bool equal(const T &num1, const T &num2, const T &eps) {
     return std::abs(num1 - num2) < eps;
 }
 
@@ -51,8 +49,8 @@ template <std::floating_point T> bool valid(const T &num) {
 // | a2*x + b2*y + c2 = 0
 // returns std::pair(x, y)
 template <std::floating_point T = double>
-std::pair<T, T> solve_system(const T &a1, const T &b1, const T &c1, const T &a2,
-                             const T &b2, const T &c2) {
+std::pair<T, T> solve_system(const T &a1, const T &b1, const T &c1, const T &a2, const T &b2,
+                             const T &c2) {
     T x = nan<T>();
     T y = nan<T>();
 

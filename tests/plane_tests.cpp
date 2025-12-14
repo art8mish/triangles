@@ -1,7 +1,7 @@
 
 #include <fstream>
-#include <stdexcept>
 #include <gtest/gtest.h>
+#include <stdexcept>
 
 #include "line.hpp"
 #include "point.hpp"
@@ -27,24 +27,24 @@ TEST_F(TestPlane, InitInvalid) {
     point_t p_zero1{};
     point_t p_zero2{};
     point_t p_zero3{};
-    ASSERT_THROW((plane_t {p_zero1, p_zero2, p_zero3}), std::logic_error);
+    ASSERT_THROW((plane_t{p_zero1, p_zero2, p_zero3}), std::logic_error);
 
     point_t p_valid1{1, 2, 3};
     vec_t vec_zero{};
-    ASSERT_THROW((plane_t {p_valid1, vec_zero}), std::logic_error);
+    ASSERT_THROW((plane_t{p_valid1, vec_zero}), std::logic_error);
 
-    ASSERT_THROW((plane_t {p_valid1, p_valid1, p_valid1}), std::logic_error);
+    ASSERT_THROW((plane_t{p_valid1, p_valid1, p_valid1}), std::logic_error);
 
     point_t p_valid2{3, 4, 5};
-    ASSERT_THROW((plane_t {p_valid1, p_valid1, p_valid2}), std::logic_error);
+    ASSERT_THROW((plane_t{p_valid1, p_valid1, p_valid2}), std::logic_error);
 
     point_t p_valid3{5, 6, 7}; // same line with p_valid1 and p_valid2
-    ASSERT_THROW((plane_t {p_valid1, p_valid1, p_valid3}), std::logic_error);
+    ASSERT_THROW((plane_t{p_valid1, p_valid1, p_valid3}), std::logic_error);
 
     point_t p_invalid{1, 2, nan<double>()};
     vec_t vec_valid{1, 2, 3};
-    ASSERT_THROW((plane_t {p_invalid, vec_valid}), std::logic_error);
-    
+    ASSERT_THROW((plane_t{p_invalid, vec_valid}), std::logic_error);
+
     ASSERT_THROW((plane_t{p_valid1, p_valid2, p_invalid}), std::logic_error);
 }
 
@@ -101,7 +101,7 @@ TEST_F(TestPlane, Equality) {
     ASSERT_FALSE(plane_eq.normal().collinear_with(plane_non_eq.normal()));
 
     point_t p_invalid{1, 2, nan<double>()};
-    ASSERT_THROW((plane_t {p_invalid, vec_eq}), std::logic_error);
+    ASSERT_THROW((plane_t{p_invalid, vec_eq}), std::logic_error);
 }
 
 TEST_F(TestPlane, Contains) {
@@ -120,7 +120,7 @@ TEST_F(TestPlane, Contains) {
     ASSERT_FALSE(plane.contains(point_t{4, 3, 4}));
 
     vec_t vec_zero{};
-    ASSERT_THROW((plane_t {p_zero, vec_zero}), std::logic_error);
+    ASSERT_THROW((plane_t{p_zero, vec_zero}), std::logic_error);
 }
 
 TEST_F(TestPlane, ParallelPlanes) {
@@ -144,7 +144,7 @@ TEST_F(TestPlane, ParallelPlanes) {
     ASSERT_FALSE(plane2.parallel_to(plane3));
     ASSERT_FALSE(plane3.normal().collinear_with(plane2.normal()));
 
-    ASSERT_THROW((plane_t {p_zero, p1, point_t{2, 0, 0}}), std::logic_error);
+    ASSERT_THROW((plane_t{p_zero, p1, point_t{2, 0, 0}}), std::logic_error);
 }
 
 TEST_F(TestPlane, SignedDistance) {
@@ -169,7 +169,7 @@ TEST_F(TestPlane, SignedDistance) {
     ASSERT_TRUE(equal<double>(dist3 * dist2, 8, eps_));
 
     ASSERT_THROW(plane.signed_distance(point_t{1, -4, nan<double>()}), std::logic_error);
-    ASSERT_THROW((plane_t {p_zero, p1, point_t{2, 0, 0}}), std::logic_error);
+    ASSERT_THROW((plane_t{p_zero, p1, point_t{2, 0, 0}}), std::logic_error);
 }
 
 TEST_F(TestPlane, DCoefficient) {
@@ -182,5 +182,5 @@ TEST_F(TestPlane, DCoefficient) {
     ASSERT_TRUE(plane.contains(p4));
     ASSERT_TRUE(zero<double>(plane.normal().edot(vec_t{p4}) + plane.D(), eps_));
 
-    ASSERT_THROW((plane_t {p1, vec_t{1, 2, nan<double>()}}), std::logic_error);
+    ASSERT_THROW((plane_t{p1, vec_t{1, 2, nan<double>()}}), std::logic_error);
 }

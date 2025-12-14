@@ -1,50 +1,30 @@
 
 
 #include <array>
+#include <cassert>
+#include <concepts>
+#include <iterator>
+#include <limits>
 #include <list>
 #include <optional>
 #include <set>
-#include <limits>
-#include <iterator>
-#include <concepts>
-#include <cassert>
 #include <stdexcept>
 
 #include "point.hpp"
 #include "triangles.hpp"
 
 namespace triangles {
-template <std::floating_point T> 
-class OctoTree {
+template <std::floating_point T> class OctoTree final {
 
     struct Octant;
     std::list<Octant> nodes_{};
     using Node = typename std::list<Octant>::iterator;
     Node root_;
 
-    // struct TriangleWrapper final {
-    //     Triangle<T> triangle_;
-    //     std::vector<Node> nodes_ {};
-
-    //     TriangleWrapper() = delete;
-    //     TriangleWrapper(const Triangle<T> &triangle): triangle_{triangle} {};
-
-    //     const Triangle<T> &triangle() const {
-    //        return triangle_;
-    //     }
-        
-    //     void add_node(Node node) {
-    //         nodes_.push_back(node);
-    //     }
-
-    //     void clear() {
-    //         nodes_.clear();
-    //     }
-    // };
     using Triangles = typename std::list<Triangle<T>>;
-    Triangles triangles_ {};
-    
-    struct Octant {
+    Triangles triangles_{};
+
+    struct Octant final {
         static const size_t CHILDS_NUM = 8;
         const T MIN_SIDE = 1;
         const size_t MAX_SIZE = 8;
@@ -56,37 +36,25 @@ class OctoTree {
 
         using Childs = typename std::array<Node, CHILDS_NUM>;
         std::optional<Childs> childs_;
-        std::vector<typename Triangles::const_iterator> triangles_ {};
+        std::vector<typename Triangles::const_iterator> triangles_{};
 
         void validate() const {
-            //std::cout << (max_.x - min_.x) << " " << (max_.y - min_.y) << " " << (max_.z - min_.z) << "\n";
-            //std::cout << mid_.to_string() << "\n";
-            if ((max_.x - min_.x < MIN_SIDE - eps_) || (max_.y - min_.y < MIN_SIDE - eps_) || (max_.z - min_.z < MIN_SIDE - eps_))
+            if ((max_.x - min_.x < MIN_SIDE - eps_) || (max_.y - min_.y < MIN_SIDE - eps_) ||
+                (max_.z - min_.z < MIN_SIDE - eps_))
                 throw std::logic_error("Node initialization points is not valid");
         }
-        
+
         Point<T> mid() const {
-            return Point<T>{
-                min_.x + (max_.x - min_.x) / 2, 
-                min_.y + (max_.y - min_.y) / 2, 
-                min_.z + (max_.z - min_.z) / 2
-            };
+            return Point<T>{min_.x + (max_.x - min_.x) / 2, min_.y + (max_.y - min_.y) / 2,
+                            min_.z + (max_.z - min_.z) / 2};
         }
 
-        // void divide(std::array<Node, CHILDS_NUM> &node_arr) {
-        //     if (is_divided())
-        //         return;
-        //     childs_.emplace(node_arr);
-        // }   
-
         Octant() = delete;
-        Octant(const Point<T> &min, const Point<T> &max)
-            : min_{min}, max_{max} {
+        Octant(const Point<T> &min, const Point<T> &max) : min_{min}, max_{max} {
             validate();
             mid_ = mid();
         }
-        Octant(const std::pair<Point<T>, Point<T>> &octant)
-            : Octant(octant.first, octant.second) {}
+        Octant(const std::pair<Point<T>, Point<T>> &octant) : Octant(octant.first, octant.second) {}
 
         const Childs &childs() const {
             return childs_.value();
@@ -96,7 +64,7 @@ class OctoTree {
             return triangles_;
         }
 
-        // notation Octant{N} means Octant from table 
+        // notation Octant{N} means Octant from table
         // ('+' -> greater than mid, '-' -> lower than mid)
         //  N   | x y z
         //------|-------
@@ -109,77 +77,47 @@ class OctoTree {
         // VII  | − − −
         // VIII | − + −
 
-
         Octant OctantI() const {
             return Octant{mid_, max_};
         }
 
         Octant OctantII() const {
-            return Octant {
-                Point<T>{mid_.x, min_.y, mid_.z},
-                Point<T>{max_.x, mid_.y, max_.z}
-            };
+            return Octant{Point<T>{mid_.x, min_.y, mid_.z}, Point<T>{max_.x, mid_.y, max_.z}};
         }
 
         Octant OctantIII() const {
-            return Octant {
-                Point<T>{mid_.x, min_.y, min_.z},
-                Point<T>{max_.x, mid_.y, mid_.z}
-            };
+            return Octant{Point<T>{mid_.x, min_.y, min_.z}, Point<T>{max_.x, mid_.y, mid_.z}};
         }
 
         Octant OctantIV() const {
-            return Octant {
-                Point<T>{mid_.x, mid_.y, min_.z},
-                Point<T>{max_.x, max_.y, mid_.z}
-            };
+            return Octant{Point<T>{mid_.x, mid_.y, min_.z}, Point<T>{max_.x, max_.y, mid_.z}};
         }
 
         Octant OctantV() const {
-            return Octant {
-                Point<T>{min_.x, mid_.y, mid_.z},
-                Point<T>{mid_.x, max_.y, max_.z}
-            };
+            return Octant{Point<T>{min_.x, mid_.y, mid_.z}, Point<T>{mid_.x, max_.y, max_.z}};
         }
 
         Octant OctantVI() const {
-            return Octant {
-                Point<T>{min_.x, min_.y, mid_.z},
-                Point<T>{mid_.x, mid_.y, max_.z}
-            };
+            return Octant{Point<T>{min_.x, min_.y, mid_.z}, Point<T>{mid_.x, mid_.y, max_.z}};
         }
 
         Octant OctantVII() const {
-            return Octant {min_, mid_};
+            return Octant{min_, mid_};
         }
 
         Octant OctantVIII() const {
-            return Octant {
-                Point<T>{min_.x, mid_.y, min_.z},
-                Point<T>{mid_.x, max_.y, mid_.z}
-            };
+            return Octant{Point<T>{min_.x, mid_.y, min_.z}, Point<T>{mid_.x, max_.y, mid_.z}};
         }
 
         bool contains(const Point<T> &p) const {
-            return ((p.x > min_.x - eps_) && (p.x < max_.x + eps_))
-                && ((p.y > min_.y - eps_) && (p.y < max_.y + eps_))
-                && ((p.z > min_.z - eps_) && (p.z < max_.z + eps_));
+            return ((p.x > min_.x - eps_) && (p.x < max_.x + eps_)) &&
+                   ((p.y > min_.y - eps_) && (p.y < max_.y + eps_)) &&
+                   ((p.z > min_.z - eps_) && (p.z < max_.z + eps_));
         }
 
         bool contains(const Triangle<T> &tr) const {
             return contains(tr.p1()) || contains(tr.p2()) || contains(tr.p3());
         }
-
-        // unsigned get_octant(const Point<T> &p) {
-
-        //     if (p.x == mid_.x) {
-
-        //     }
-
-        //     if (point.x < mid_.x) {
-
-        //     }
-        // }
 
         size_t size() const {
             return triangles_.size();
@@ -195,12 +133,6 @@ class OctoTree {
             childs_.emplace(std::move(childs));
         }
 
-        // void divide(Node begin, Node end) {
-        //     if (is_divided())
-        //         return;
-        //     childs_.emplace(std::copy(begin, end, childs_.begin()));
-        // }
-
         bool is_divided() const {
             return childs_.has_value();
         }
@@ -211,21 +143,21 @@ class OctoTree {
 
         void add_triangle(Triangles::const_iterator triangle_it) {
             triangles_.push_back(triangle_it);
-        } 
+        }
 
         void clear_triangles() {
             triangles_.clear();
         }
 
         std::string to_string() const {
-            std::string dump = "Octant(x=[" + std::to_string(min_.x) + ": " + std::to_string(max_.x)
-                + "], y=[" + std::to_string(min_.y) + ": " + std::to_string(max_.y)
-                + "], z=[" + std::to_string(min_.z) + ": " + std::to_string(max_.z) + "], "
-                + "mid=" + mid_.to_string() + ")\n";
+            std::string dump = "Octant(x=[" + std::to_string(min_.x) + ": " +
+                               std::to_string(max_.x) + "], y=[" + std::to_string(min_.y) + ": " +
+                               std::to_string(max_.y) + "], z=[" + std::to_string(min_.z) + ": " +
+                               std::to_string(max_.z) + "], " + "mid=" + mid_.to_string() + ")\n";
             if (!is_divided() && triangles_.size() != 0) {
                 dump += "Triangles:\n";
                 auto begin = triangles_.begin();
-                for (auto tr_it : triangles_ )
+                for (auto tr_it : triangles_)
                     dump += tr_it->to_string() + "\n";
             }
             return dump;
@@ -234,22 +166,11 @@ class OctoTree {
 
     void divide_node(Node node) {
         assert(!node->is_divided());
-        // std::cout << "Dividing node..." << "\n";
-
-        // std::cout << (node->OctantI()).to_string() << "\n";
         std::array<Octant, Octant::CHILDS_NUM> child_octants{
-            node->OctantI(),
-            node->OctantII(),
-            node->OctantIII(),
-            node->OctantIV(),
-            node->OctantV(),
-            node->OctantVI(),
-            node->OctantVII(),
-            node->OctantVIII()
-        };
+            node->OctantI(), node->OctantII(), node->OctantIII(), node->OctantIV(),
+            node->OctantV(), node->OctantVI(), node->OctantVII(), node->OctantVIII()};
 
-        // std::cout << "Copying triangles..." << "\n";
-        typename Octant::Childs childs {};
+        typename Octant::Childs childs{};
         for (size_t i = 0; i < child_octants.size(); ++i) {
             childs[i] = nodes_.insert(nodes_.end(), std::move(child_octants[i]));
         }
@@ -270,26 +191,23 @@ class OctoTree {
             divide_node(node);
 
         if (node->is_divided()) {
-            for (auto child: node->childs()) {
+            for (auto child : node->childs()) {
                 if (child->contains(*tr_it))
                     add_triangle_(tr_it, child);
             }
-        }
-        else
+        } else
             node->add_triangle(tr_it);
     }
 
     void dump_node(Node node) const {
-        std::cout << "Octant(min=" << node->min_.to_string()
-            << ", max=[" << node->max_.to_string()
-            << ", mid=" << node->mid_.to_string() << ")\n";
+        std::cout << "Octant(min=" << node->min_.to_string() << ", max=[" << node->max_.to_string()
+                  << ", mid=" << node->mid_.to_string() << ")\n";
         if (node->is_divided()) {
             std::cout << "Childs:\n";
             for (auto child : node->childs()) {
                 dump_node(child);
             }
-        }
-        else if (node->triangles_.size() > 0) {
+        } else if (node->triangles_.size() > 0) {
             std::cout << "Triangles:\n";
             auto begin = triangles_.begin();
             for (auto tr_it : node->triangles_)
@@ -304,12 +222,11 @@ class OctoTree {
     }
 
 public:
-    
     OctoTree(const Point<T> &min, const Point<T> &max) {
         nodes_.push_back(Octant{min, max});
         root_ = nodes_.begin();
     }
-    OctoTree(T range) : OctoTree(Point<T> {-range, -range, -range}, Point<T> {range, range, range}) {}
+    OctoTree(T range) : OctoTree(Point<T>{-range, -range, -range}, Point<T>{range, range, range}) {}
 
     void add_triangle(const Triangle<T> &triangle) {
         check_contains(triangle);
@@ -324,27 +241,23 @@ public:
     }
 
     std::set<size_t> intersections() const {
-        std::set<size_t> intersections {};
-        //intersections.reserve(triangles_.size());
+        std::set<size_t> intersections{};
+        // intersections.reserve(triangles_.size());
 
         auto first_tr = triangles_.begin();
-        for (auto node=nodes_.begin(), nend=nodes_.end(); node != nend; ++node) {
+        for (auto node = nodes_.begin(), nend = nodes_.end(); node != nend; ++node) {
             if (node->is_divided())
                 continue;
 
             std::vector<typename Triangles::const_iterator> triangles = node->triangles_;
-            //const size_t n = triangles.size();
             auto tr_end = triangles.end();
-            
+
             for (auto i = triangles.begin(); i != tr_end; ++i) {
                 typename Triangles::const_iterator triangle_i = *i;
                 bool found = false;
                 for (auto j = i + 1; j != tr_end; ++j) {
                     typename Triangles::const_iterator triangle_j = *j;
                     if (triangle_i->intersects(*triangle_j)) {
-                        // std::cout << std::distance(first_tr, triangle_i)<< " intersects " <<  std::distance(first_tr, triangle_j) << "\n";
-                        //std::cout << std::distance(first_tr, triangle_i) << ": " << triangle_i->to_string() << "\n";
-                        //std::cout << std::distance(first_tr, triangle_j) << ": " << triangle_j->to_string() << "\n";
                         auto jndex = std::distance(first_tr, triangle_j);
                         assert(jndex >= 0);
                         intersections.insert(static_cast<size_t>(jndex));
@@ -362,11 +275,8 @@ public:
     }
 
     void dump() const {
-        //std::cout << std::fixed << std::setprecision(2);
         std::cout << "OctoTree dump:\n";
         dump_node(root_);
-        //std::cout.unsetf(std::ios::fixed);
-        //std::cout << std::setprecision(6);
     }
 };
 } // namespace triangles

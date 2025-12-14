@@ -9,7 +9,7 @@ ReferenceAlignment: Right
 PointerAlignment: Right
 
 # foo() {}
-AllowShortFunctionsOnASingleLine: None
+AllowShortFunctionsOnASingleLine: Empty
 
 # if (...)
 #   return;

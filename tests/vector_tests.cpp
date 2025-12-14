@@ -1,8 +1,8 @@
 
 #include <cmath>
-#include <stdexcept>
 #include <fstream>
 #include <gtest/gtest.h>
+#include <stdexcept>
 
 #include "point.hpp"
 #include "utils.hpp"
@@ -123,20 +123,16 @@ TEST_F(TestVector, Equality) {
     ASSERT_FALSE(vec_points == vec_points_neq_1);
     ASSERT_TRUE(vec_points != vec_points_neq_1);
 
-    ASSERT_TRUE((vec_points == vec_points_neq_1) ==
-                (vec_points_neq_1 == vec_points));
-    ASSERT_TRUE((vec_points != vec_points_neq_1) ==
-                (vec_points_neq_1 != vec_points));
+    ASSERT_TRUE((vec_points == vec_points_neq_1) == (vec_points_neq_1 == vec_points));
+    ASSERT_TRUE((vec_points != vec_points_neq_1) == (vec_points_neq_1 != vec_points));
 
     point_t p_from_neq = {0.0, 0.001, 0.0};
     vec_t vec_points_neq_2{p_from_neq, p_to};
     ASSERT_FALSE(vec_points == vec_points_neq_2);
     ASSERT_TRUE(vec_points != vec_points_neq_2);
 
-    ASSERT_TRUE((vec_points == vec_points_neq_2) ==
-                (vec_points_neq_2 == vec_points));
-    ASSERT_TRUE((vec_points != vec_points_neq_2) ==
-                (vec_points_neq_2 != vec_points));
+    ASSERT_TRUE((vec_points == vec_points_neq_2) == (vec_points_neq_2 == vec_points));
+    ASSERT_TRUE((vec_points != vec_points_neq_2) == (vec_points_neq_2 != vec_points));
 
     vec_t vec_nums{0, 25.4, 6.7, 15.4, 94.3, 2.4};
     vec_t vec_nums_eq{0, 25.4, 6.7, 15.4, 94.3, 2.4};
@@ -161,7 +157,7 @@ TEST_F(TestVector, Enorm) {
     vec_t vec_valid{1, -2, 3};
     ASSERT_TRUE(equal<double>(vec_valid.enorm(), std::sqrt(14), eps_));
 
-    ASSERT_THROW((vec_t {1, 2, nan<double>()}), std::logic_error);
+    ASSERT_THROW((vec_t{1, 2, nan<double>()}), std::logic_error);
 }
 
 TEST_F(TestVector, Edot) {
@@ -260,7 +256,7 @@ TEST_F(TestVector, Normalization) {
     vec_t vec_normalized2{0, 1, 0};
     ASSERT_TRUE(vec_normalized2.is_normalized());
 
-    ASSERT_THROW((vec_t {1, 2, nan<double>()}), std::logic_error);
+    ASSERT_THROW((vec_t{1, 2, nan<double>()}), std::logic_error);
 
     vec_t vec_zero{};
     ASSERT_TRUE(vec_zero.is_zero());
@@ -309,5 +305,5 @@ TEST_F(TestVector, GetPerpendicular) {
 }
 
 TEST_F(TestVector, InvalidStateExceptions) {
-    ASSERT_THROW((vec_t {1, 2, nan<double>()}), std::logic_error);
+    ASSERT_THROW((vec_t{1, 2, nan<double>()}), std::logic_error);
 }

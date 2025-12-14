@@ -12,10 +12,8 @@ protected:
     using point_double_t = typename triangles::Point<double>;
     using point_ldouble_t = typename triangles::Point<long double>;
 
-    void SetUp() {
-    }
-    void TearDown() {
-    }
+    void SetUp() {}
+    void TearDown() {}
 };
 
 TEST_F(TestPoint, DefaultInit) {

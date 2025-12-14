@@ -12,7 +12,7 @@
 #include "vector.hpp"
 
 namespace triangles {
-template <std::floating_point T> class Line {
+template <std::floating_point T> class Line final {
     T eps_{epsilon<T>()};
 
     // L: p_ + vec(d_) * t
@@ -25,14 +25,11 @@ template <std::floating_point T> class Line {
     }
 
 public:
-    Line(T x1, T y1, T z1, T x2, T y2, T z2)
-        : p_{x1, y1, z1}, d_{x1, y1, z1, x2, y2, z2} {
+    Line(T x1, T y1, T z1, T x2, T y2, T z2) : p_{x1, y1, z1}, d_{x1, y1, z1, x2, y2, z2} {
         validate();
     }
 
-    Line(const Point<T> &p1, const Point<T> &p2)
-        : Line(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z) {
-    }
+    Line(const Point<T> &p1, const Point<T> &p2) : Line(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z) {}
 
     Line(const Point<T> &p, const Vector<T> &v) : p_{p}, d_{v} {
         validate();
@@ -44,9 +41,8 @@ public:
 
         d_ = n1.ecross(n2);
         if (d_.is_zero()) { // planes are parallel
-            throw std::invalid_argument(
-                "Can't find intersection line: planes are parallel "
-                "or coincident");
+            throw std::invalid_argument("Can't find intersection line: planes are parallel "
+                                        "or coincident");
         }
 
         // try to find p_ as p_ = a*n1 + b*n2
@@ -81,8 +77,7 @@ public:
     }
 
     Point<T> get_point(T t) const {
-        return Point<T>{p_.x + d_.x() * t, p_.y + d_.y() * t,
-                        p_.z + d_.z() * t};
+        return Point<T>{p_.x + d_.x() * t, p_.y + d_.y() * t, p_.z + d_.z() * t};
     }
 
     bool operator==(const Line<T> &other) const {
@@ -106,22 +101,14 @@ public:
         const Vector<T> &n = plane.normal();
 
         if (n.orthogonal_to(d_)) {
-            throw std::invalid_argument(plane.to_string() + " shouldn't be parallel with " + to_string());
+            throw std::invalid_argument(plane.to_string() + " shouldn't be parallel with " +
+                                        to_string());
         }
 
-        const Point<T> &line_p =
-            (p_ == plane.point()) ? get_point(1) : p_;
-        // std::cout << "Line point: " + line_p.to_string() + '\n';
-
+        const Point<T> &line_p = (p_ == plane.point()) ? get_point(1) : p_;
         const Vector<T> v{line_p, plane.point()};
-        // std::cout << "V: " + v.to_string() + '\n';
-        // std::cout << "n: " + n.to_string() + '\n';
-        // std::cout << "d: " + d.to_string() + '\n';
 
         T t = n.edot(v) / n.edot(d_);
-        // std::cout << "n.edot(v): " + std::to_string(n.edot(v)) + '\n';
-        // std::cout << "n.edot(d): " + std::to_string(n.edot(d)) + '\n';
-        // std::cout << "t: " + std::to_string(t) + '\n';
         if (p_ == plane.point())
             t += 1;
         return get_point(t);

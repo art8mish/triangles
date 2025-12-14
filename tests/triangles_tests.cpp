@@ -1,6 +1,6 @@
 #include <fstream>
-#include <stdexcept>
 #include <gtest/gtest.h>
+#include <stdexcept>
 
 #include "point.hpp"
 #include "triangles.hpp"
@@ -177,18 +177,13 @@ protected:
 
     tr_t tr_main1{p_a11, p_a15, p_e13};
     tr_t tr_main2{p_a21, p_a25, p_e23};
-    
 
-    void SetUp() {
-    }
-    void TearDown() {
-    }
+    void SetUp() {}
+    void TearDown() {}
 
-    void SegmentSegmentIntersection(const point_t &p_1n, const point_t &p_2n,
-                                    const point_t &p_3n, const point_t &p_end,
-                                    const bool sec, const bool contain_p1,
-                                    const bool contain_p2,
-                                    const std::string &context = "") {
+    void SegmentSegmentIntersection(const point_t &p_1n, const point_t &p_2n, const point_t &p_3n,
+                                    const point_t &p_end, const bool sec, const bool contain_p1,
+                                    const bool contain_p2, const std::string &context = "") {
         std::string context_msg{"Test: SegmentSegment"};
         context_msg += context;
 
@@ -219,12 +214,10 @@ protected:
         ASSERT_EQ(contain_p2, seg_a1.intersects(seg3)) << context_msg;
     }
 
-    void TriangleSegmentIntersection(const point_t &p_1n, const point_t &p_2n,
-                                     const point_t &p_3n, const point_t &p_end,
-                                     const point_t &tr_p1, const point_t &tr_p3,
-                                     const bool sec, const bool contain_p_n,
-                                     const bool contain_p_end,
-                                     const std::string &context = "") {
+    void TriangleSegmentIntersection(const point_t &p_1n, const point_t &p_2n, const point_t &p_3n,
+                                     const point_t &p_end, const point_t &tr_p1,
+                                     const point_t &tr_p3, const bool sec, const bool contain_p_n,
+                                     const bool contain_p_end, const std::string &context = "") {
 
         std::string context_msg{"Test: TriangleSegment"};
         context_msg += context;
@@ -262,11 +255,10 @@ protected:
         ASSERT_EQ(contain_p_end, tr1.intersects(seg3)) << context_msg;
     }
 
-
     void TriangleTriangleIntersectionSide(const point_t &src3, const std::string &context = "") {
         std::string context_msg{"Test:  TriangleTriangleBySide"};
         context_msg += context;
-        
+
         tr_t tr_in{src3, p_c13, p_b14};
         ASSERT_EQ(tr_in.type(), tr_t::Kind::TRIANGLE) << context_msg;
 
@@ -308,9 +300,10 @@ protected:
         ASSERT_FALSE(tr_out.intersects(tr_main2)) << context_msg;
     }
 
-    void TriangleTriangleIntersectionCrossCase(const point_t &src1, const point_t &src3, 
-        const point_t &dst2, const point_t &dst3, 
-        bool sec_src, bool sec_dst2, bool sec_dst3, const std::string &context = "") {
+    void TriangleTriangleIntersectionCrossCase(const point_t &src1, const point_t &src3,
+                                               const point_t &dst2, const point_t &dst3,
+                                               bool sec_src, bool sec_dst2, bool sec_dst3,
+                                               const std::string &context = "") {
 
         tr_t tr2{src1, src3, dst2};
         ASSERT_EQ(tr2.type(), tr_t::Kind::TRIANGLE) << context;
@@ -329,21 +322,27 @@ protected:
         ASSERT_EQ(sec_src || sec_dst3, tr3.intersects(tr_main2)) << context;
     }
 
-    void TriangleTriangleIntersectionCross(const point_t &src1, const point_t &src3, bool sec_src, const std::string &context = "") {
+    void TriangleTriangleIntersectionCross(const point_t &src1, const point_t &src3, bool sec_src,
+                                           const std::string &context = "") {
         std::string context_msg{"Test:  TriangleTriangleCross"};
         context_msg += context;
-        
-        TriangleTriangleIntersectionCrossCase(src1, src3, p_b24, p_b34, sec_src, true, true, context_msg + "DstIn");
-        TriangleTriangleIntersectionCrossCase(src1, src3, p_a24, p_a34, sec_src, true, true, context_msg + "DstTouchSideFar");
-        TriangleTriangleIntersectionCrossCase(src1, src3, p_b215, p_b315, sec_src, true, false, context_msg + "DstTouchSideClose");
-        TriangleTriangleIntersectionCrossCase(src1, src3, p_a21, p_a31, sec_src, true, false, context_msg + "DstTouchEdge");
-        TriangleTriangleIntersectionCrossCase(src1, src3, p_b21, p_b31, sec_src, false, false, context_msg + "DstOut");
+
+        TriangleTriangleIntersectionCrossCase(src1, src3, p_b24, p_b34, sec_src, true, true,
+                                              context_msg + "DstIn");
+        TriangleTriangleIntersectionCrossCase(src1, src3, p_a24, p_a34, sec_src, true, true,
+                                              context_msg + "DstTouchSideFar");
+        TriangleTriangleIntersectionCrossCase(src1, src3, p_b215, p_b315, sec_src, true, false,
+                                              context_msg + "DstTouchSideClose");
+        TriangleTriangleIntersectionCrossCase(src1, src3, p_a21, p_a31, sec_src, true, false,
+                                              context_msg + "DstTouchEdge");
+        TriangleTriangleIntersectionCrossCase(src1, src3, p_b21, p_b31, sec_src, false, false,
+                                              context_msg + "DstOut");
     }
 
-    void TriangleTriangleIntersectionParallel(
-        const point_t &tr2_p1, const point_t &tr2_p2, const point_t &tr2_p3,
-        const point_t &tr3_p1, const point_t &tr3_p2, const point_t &tr3_p3,
-        const std::string &context = "") {
+    void TriangleTriangleIntersectionParallel(const point_t &tr2_p1, const point_t &tr2_p2,
+                                              const point_t &tr2_p3, const point_t &tr3_p1,
+                                              const point_t &tr3_p2, const point_t &tr3_p3,
+                                              const std::string &context = "") {
         std::string context_msg{"Test:  TriangleTriangleParallel"};
         context_msg += context;
 
@@ -387,16 +386,14 @@ protected:
     }
 };
 
-
 TEST_F(TestTriangles, InitCustom) {
     tr_t tr1{p_c31, p_d3, p_a14};
     ASSERT_TRUE(tr1.intersects(tr_main2));
 }
 
-
 TEST_F(TestTriangles, InitInvalid) {
     point_t p_invalid{1, 2, nan<double>()};
-    ASSERT_THROW((tr_t {p_zero, p_invalid, p_a11}), std::logic_error);
+    ASSERT_THROW((tr_t{p_zero, p_invalid, p_a11}), std::logic_error);
 }
 
 TEST_F(TestTriangles, InitValid) {
@@ -651,23 +648,19 @@ TEST_F(TestTriangles, IntersectionSegmentSegmentPerpendicular) {
 }
 
 TEST_F(TestTriangles, IntersectionSegmentSegmentParallel) {
-    SegmentSegmentIntersection(p_a12, p_a22, p_a32, p_a13, true, true, true,
-                               "ParallelInside");
+    SegmentSegmentIntersection(p_a12, p_a22, p_a32, p_a13, true, true, true, "ParallelInside");
     SegmentSegmentIntersection(p_a12, p_a22, p_a32, p_a15, true, true, true,
                                "ParallelInside1Boundary");
     SegmentSegmentIntersection(p_a11, p_a21, p_a31, p_a15, true, true, true,
                                "ParallelInside2Boundaries");
-    SegmentSegmentIntersection(p_a12, p_a22, p_a32, p_a16, true, true, false,
-                               "ParallelOverlap");
+    SegmentSegmentIntersection(p_a12, p_a22, p_a32, p_a16, true, true, false, "ParallelOverlap");
     SegmentSegmentIntersection(p_a15, p_a25, p_a35, p_a17, true, true, false,
                                "ParallelOverlap1Boundary");
-    SegmentSegmentIntersection(p_a16, p_a26, p_a36, p_a17, false, false, false,
-                               "ParallelOut");
+    SegmentSegmentIntersection(p_a16, p_a26, p_a36, p_a17, false, false, false, "ParallelOut");
 }
 
 TEST_F(TestTriangles, IntersectionSegmentSegmentAngular) {
-    SegmentSegmentIntersection(p_c12, p_c22, p_c32, p_d3, true, false, false,
-                               "AngularSecInside");
+    SegmentSegmentIntersection(p_c12, p_c22, p_c32, p_d3, true, false, false, "AngularSecInside");
     SegmentSegmentIntersection(p_c12, p_c22, p_c32, p_a13, true, false, true,
                                "AngularEndSecInside");
     SegmentSegmentIntersection(p_c12, p_c22, p_c32, p_b13, false, false, false,
@@ -705,121 +698,111 @@ TEST_F(TestTriangles, IntersectionSegmentSegmentAngular) {
     SegmentSegmentIntersection(p_c16, p_c26, p_c36, p_b15, false, false, false,
                                "AngularNoSecOverlap1Boundary");
 
-    SegmentSegmentIntersection(p_c16, p_c26, p_c36, p_d7, false, false, false,
-                               "AngularSecOut");
-    SegmentSegmentIntersection(p_c16, p_c26, p_c36, p_a17, false, false, false,
-                               "AngularEndSecOut");
-    SegmentSegmentIntersection(p_c16, p_c26, p_c36, p_b17, false, false, false,
-                               "AngularNoSecOut");
+    SegmentSegmentIntersection(p_c16, p_c26, p_c36, p_d7, false, false, false, "AngularSecOut");
+    SegmentSegmentIntersection(p_c16, p_c26, p_c36, p_a17, false, false, false, "AngularEndSecOut");
+    SegmentSegmentIntersection(p_c16, p_c26, p_c36, p_b17, false, false, false, "AngularNoSecOut");
 }
 
 TEST_F(TestTriangles, IntersectionTriangleSegmentPerpendicularInside) {
-    TriangleSegmentIntersection(p_c12, p_c22, p_c32, p_d2, p_c13, p_c33, true,
-                                false, false, "PerpendicularSecInsideLeft");
-    TriangleSegmentIntersection(p_c12, p_c22, p_c32, p_d2, p_c12, p_c32, true,
-                                true, false, "PerpendicularSecInsideMid");
-    TriangleSegmentIntersection(p_c12, p_c22, p_c32, p_d2, p_e125, p_e325, true,
-                                true, false, "PerpendicularSecInsideMidUp");
-    TriangleSegmentIntersection(p_c12, p_c22, p_c32, p_d2, p_e12, p_e32, true,
-                                true, false, "PerpendicularSecInsideRight");
+    TriangleSegmentIntersection(p_c12, p_c22, p_c32, p_d2, p_c13, p_c33, true, false, false,
+                                "PerpendicularSecInsideLeft");
+    TriangleSegmentIntersection(p_c12, p_c22, p_c32, p_d2, p_c12, p_c32, true, true, false,
+                                "PerpendicularSecInsideMid");
+    TriangleSegmentIntersection(p_c12, p_c22, p_c32, p_d2, p_e125, p_e325, true, true, false,
+                                "PerpendicularSecInsideMidUp");
+    TriangleSegmentIntersection(p_c12, p_c22, p_c32, p_d2, p_e12, p_e32, true, true, false,
+                                "PerpendicularSecInsideRight");
 
-    TriangleSegmentIntersection(p_c12, p_c22, p_c32, p_a12, p_c13, p_c33, true,
-                                false, true, "PerpendicularEndSecInsideLeft");
-    TriangleSegmentIntersection(p_c12, p_c22, p_c32, p_a12, p_c12, p_c32, true,
-                                true, true, "PerpendicularEndSecInsideMid");
-    TriangleSegmentIntersection(p_c12, p_c22, p_c32, p_a12, p_e125, p_e325,
-                                true, true, true,
+    TriangleSegmentIntersection(p_c12, p_c22, p_c32, p_a12, p_c13, p_c33, true, false, true,
+                                "PerpendicularEndSecInsideLeft");
+    TriangleSegmentIntersection(p_c12, p_c22, p_c32, p_a12, p_c12, p_c32, true, true, true,
+                                "PerpendicularEndSecInsideMid");
+    TriangleSegmentIntersection(p_c12, p_c22, p_c32, p_a12, p_e125, p_e325, true, true, true,
                                 "PerpendicularEndSecInsideMidUp");
-    TriangleSegmentIntersection(p_c12, p_c22, p_c32, p_a12, p_e12, p_e32, true,
-                                true, true, "PerpendicularEndSecInsideRight");
+    TriangleSegmentIntersection(p_c12, p_c22, p_c32, p_a12, p_e12, p_e32, true, true, true,
+                                "PerpendicularEndSecInsideRight");
 
-    TriangleSegmentIntersection(p_c12, p_c22, p_c32, p_b12, p_c13, p_c33, true,
-                                false, true, "PerpendicularNoSecInsideCLeft");
-    TriangleSegmentIntersection(p_c12, p_c22, p_c32, p_b12, p_c12, p_c32, true,
-                                true, true, "PerpendicularNoSecInsideCMid");
-    TriangleSegmentIntersection(p_c12, p_c22, p_c32, p_b12, p_e125, p_e325,
-                                true, true, true,
+    TriangleSegmentIntersection(p_c12, p_c22, p_c32, p_b12, p_c13, p_c33, true, false, true,
+                                "PerpendicularNoSecInsideCLeft");
+    TriangleSegmentIntersection(p_c12, p_c22, p_c32, p_b12, p_c12, p_c32, true, true, true,
+                                "PerpendicularNoSecInsideCMid");
+    TriangleSegmentIntersection(p_c12, p_c22, p_c32, p_b12, p_e125, p_e325, true, true, true,
                                 "PerpendicularNoSecInsideCMidUp");
-    TriangleSegmentIntersection(p_c12, p_c22, p_c32, p_b12, p_e12, p_e32, true,
-                                true, true, "PerpendicularNoSecInsideCRight");
+    TriangleSegmentIntersection(p_c12, p_c22, p_c32, p_b12, p_e12, p_e32, true, true, true,
+                                "PerpendicularNoSecInsideCRight");
 
-    TriangleSegmentIntersection(p_c12, p_c22, p_c32, p_b12, p_b11, p_b31, false,
-                                false, false, "PerpendicularNoSecInsideBLeft");
-    TriangleSegmentIntersection(p_c12, p_c22, p_c32, p_b12, p_b12, p_b32, true,
-                                false, true, "PerpendicularNoSecInsideBMid");
+    TriangleSegmentIntersection(p_c12, p_c22, p_c32, p_b12, p_b11, p_b31, false, false, false,
+                                "PerpendicularNoSecInsideBLeft");
+    TriangleSegmentIntersection(p_c12, p_c22, p_c32, p_b12, p_b12, p_b32, true, false, true,
+                                "PerpendicularNoSecInsideBMid");
 }
 
 TEST_F(TestTriangles, IntersectionTriangleSegmentPerpendicularBoundary) {
-    TriangleSegmentIntersection(p_c15, p_c25, p_c35, p_d5, p_c17, p_c37, true,
-                                false, false, "PerpendicularSecBoundaryLeft");
-    TriangleSegmentIntersection(p_c15, p_c25, p_c35, p_d5, p_c15, p_c35, true,
-                                true, false, "PerpendicularSecBoundaryMid");
-    TriangleSegmentIntersection(p_c15, p_c25, p_c35, p_d5, p_e165, p_e365, true,
-                                true, false, "PerpendicularSecBoundaryMidUp");
-    TriangleSegmentIntersection(p_c15, p_c25, p_c35, p_d5, p_e16, p_e36, true,
-                                true, false, "PerpendicularSecBoundaryRight");
+    TriangleSegmentIntersection(p_c15, p_c25, p_c35, p_d5, p_c17, p_c37, true, false, false,
+                                "PerpendicularSecBoundaryLeft");
+    TriangleSegmentIntersection(p_c15, p_c25, p_c35, p_d5, p_c15, p_c35, true, true, false,
+                                "PerpendicularSecBoundaryMid");
+    TriangleSegmentIntersection(p_c15, p_c25, p_c35, p_d5, p_e165, p_e365, true, true, false,
+                                "PerpendicularSecBoundaryMidUp");
+    TriangleSegmentIntersection(p_c15, p_c25, p_c35, p_d5, p_e16, p_e36, true, true, false,
+                                "PerpendicularSecBoundaryRight");
 
-    TriangleSegmentIntersection(p_c15, p_c25, p_c35, p_a15, p_c17, p_c37, true,
-                                false, true, "PerpendicularEndSecBoundaryLeft");
-    TriangleSegmentIntersection(p_c15, p_c25, p_c35, p_a15, p_c15, p_c35, true,
-                                true, true, "PerpendicularEndSecBoundaryMid");
-    TriangleSegmentIntersection(p_c15, p_c25, p_c35, p_a15, p_e165, p_e365,
-                                true, true, true,
+    TriangleSegmentIntersection(p_c15, p_c25, p_c35, p_a15, p_c17, p_c37, true, false, true,
+                                "PerpendicularEndSecBoundaryLeft");
+    TriangleSegmentIntersection(p_c15, p_c25, p_c35, p_a15, p_c15, p_c35, true, true, true,
+                                "PerpendicularEndSecBoundaryMid");
+    TriangleSegmentIntersection(p_c15, p_c25, p_c35, p_a15, p_e165, p_e365, true, true, true,
                                 "PerpendicularEndSecBoundaryMidUp");
-    TriangleSegmentIntersection(p_c15, p_c25, p_c35, p_a15, p_e16, p_e36, true,
-                                true, true, "PerpendicularEndSecBoundaryRight");
+    TriangleSegmentIntersection(p_c15, p_c25, p_c35, p_a15, p_e16, p_e36, true, true, true,
+                                "PerpendicularEndSecBoundaryRight");
 
-    TriangleSegmentIntersection(p_c15, p_c25, p_c35, p_b15, p_c17, p_c37, true,
-                                false, true, "PerpendicularNoSecBoundaryCLeft");
-    TriangleSegmentIntersection(p_c15, p_c25, p_c35, p_b15, p_c15, p_c35, true,
-                                true, true, "PerpendicularNoSecBoundaryCMid");
-    TriangleSegmentIntersection(p_c15, p_c25, p_c35, p_b15, p_e165, p_e365,
-                                true, true, true,
+    TriangleSegmentIntersection(p_c15, p_c25, p_c35, p_b15, p_c17, p_c37, true, false, true,
+                                "PerpendicularNoSecBoundaryCLeft");
+    TriangleSegmentIntersection(p_c15, p_c25, p_c35, p_b15, p_c15, p_c35, true, true, true,
+                                "PerpendicularNoSecBoundaryCMid");
+    TriangleSegmentIntersection(p_c15, p_c25, p_c35, p_b15, p_e165, p_e365, true, true, true,
                                 "PerpendicularNoSecBoundaryCMidUp");
-    TriangleSegmentIntersection(p_c15, p_c25, p_c35, p_b15, p_e16, p_e36, true,
-                                true, true, "PerpendicularNoSecBoundaryCRight");
+    TriangleSegmentIntersection(p_c15, p_c25, p_c35, p_b15, p_e16, p_e36, true, true, true,
+                                "PerpendicularNoSecBoundaryCRight");
 
-    TriangleSegmentIntersection(p_c15, p_c25, p_c35, p_b15, p_b11, p_b31, false,
-                                false, false,
+    TriangleSegmentIntersection(p_c15, p_c25, p_c35, p_b15, p_b11, p_b31, false, false, false,
                                 "PerpendicularNoSecBoundaryBLeft");
-    TriangleSegmentIntersection(p_c15, p_c25, p_c35, p_b15, p_b15, p_b35, true,
-                                false, true, "PerpendicularNoSecBoundaryBMid");
+    TriangleSegmentIntersection(p_c15, p_c25, p_c35, p_b15, p_b15, p_b35, true, false, true,
+                                "PerpendicularNoSecBoundaryBMid");
 }
 
 TEST_F(TestTriangles, IntersectionTriangleSegmentPerpendicularSecOut) {
-    TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_d7, p_c18, p_c38, true,
-                                false, false, "PerpendicularSecOutLeft");
-    TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_d7, p_c17, p_c37, true,
-                                true, false, "PerpendicularSecOutMid");
-    TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_d7, p_e195, p_e395, true,
-                                true, false, "PerpendicularSecOutMidUp");
-    TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_d7, p_e18, p_e38, true,
-                                true, false, "PerpendicularSecOutRight");
+    TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_d7, p_c18, p_c38, true, false, false,
+                                "PerpendicularSecOutLeft");
+    TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_d7, p_c17, p_c37, true, true, false,
+                                "PerpendicularSecOutMid");
+    TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_d7, p_e195, p_e395, true, true, false,
+                                "PerpendicularSecOutMidUp");
+    TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_d7, p_e18, p_e38, true, true, false,
+                                "PerpendicularSecOutRight");
 
-    TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_a17, p_c18, p_c38, true,
-                                false, false, "PerpendicularEndSecOutLeft");
-    TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_a17, p_c17, p_c37, true,
-                                true, false, "PerpendicularEndSecOutMid");
-    TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_a17, p_e195, p_e395,
-                                true, true, false,
+    TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_a17, p_c18, p_c38, true, false, false,
+                                "PerpendicularEndSecOutLeft");
+    TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_a17, p_c17, p_c37, true, true, false,
+                                "PerpendicularEndSecOutMid");
+    TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_a17, p_e195, p_e395, true, true, false,
                                 "PerpendicularEndSecOutMidUp");
-    TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_a17, p_e18, p_e38, true,
-                                true, false, "PerpendicularEndSecOutRight");
+    TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_a17, p_e18, p_e38, true, true, false,
+                                "PerpendicularEndSecOutRight");
 
-    TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_b17, p_c18, p_c38, true,
-                                false, false, "PerpendicularNoSecOutCLeft");
-    TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_b17, p_c17, p_c37, true,
-                                true, false, "PerpendicularNoSecOutCMid");
-    TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_b17, p_e195, p_e395,
-                                true, true, false,
+    TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_b17, p_c18, p_c38, true, false, false,
+                                "PerpendicularNoSecOutCLeft");
+    TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_b17, p_c17, p_c37, true, true, false,
+                                "PerpendicularNoSecOutCMid");
+    TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_b17, p_e195, p_e395, true, true, false,
                                 "PerpendicularNoSecOutCMidUp");
-    TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_b17, p_e18, p_e38, true,
-                                true, false, "PerpendicularNoSecOutCRight");
+    TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_b17, p_e18, p_e38, true, true, false,
+                                "PerpendicularNoSecOutCRight");
 
-    TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_b17, p_b11, p_b31, false,
-                                false, false, "PerpendicularNoSecOutBLeft");
-    TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_b17, p_b17, p_b37, true,
-                                false, true, "PerpendicularNoSecOutBMid");
+    TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_b17, p_b11, p_b31, false, false, false,
+                                "PerpendicularNoSecOutBLeft");
+    TriangleSegmentIntersection(p_c17, p_c27, p_c37, p_b17, p_b17, p_b37, true, false, true,
+                                "PerpendicularNoSecOutBMid");
 }
 
 TEST_F(TestTriangles, IntersectionTriangleTriangle2D) {
@@ -863,7 +846,6 @@ TEST_F(TestTriangles, IntersectionTriangleTriangle2D) {
     ASSERT_TRUE(tr1.intersects(tr7));
     ASSERT_TRUE(tr7.intersects(tr1));
 
-
     tr_t tr8{p_a12, p_a15, p_c15};
     ASSERT_EQ(tr6.type(), tr_t::Kind::TRIANGLE);
 
@@ -877,7 +859,7 @@ TEST_F(TestTriangles, IntersectionTriangleTriangle2D) {
     ASSERT_EQ(tr9.type(), tr_t::Kind::TRIANGLE);
 
     ASSERT_TRUE(tr8.intersects(tr10));
-    ASSERT_TRUE(tr10.intersects(tr8));    
+    ASSERT_TRUE(tr10.intersects(tr8));
 }
 
 TEST_F(TestTriangles, IntersectionTriangleTriangle3D_Parallel) {
@@ -898,7 +880,7 @@ TEST_F(TestTriangles, IntersectionTriangleTriangle3D_Cross) {
     TriangleTriangleIntersectionCross(p_c11, p_c31, false, "SrcOutPerpendicular");
     TriangleTriangleIntersectionCross(p_c11, p_e32, false, "SrcOutAngled");
 
-    TriangleTriangleIntersectionCross(p_c13, p_c33, true,"SrcInPerpendicular");
+    TriangleTriangleIntersectionCross(p_c13, p_c33, true, "SrcInPerpendicular");
     TriangleTriangleIntersectionCross(p_c13, p_b33, true, "SrcInAngledIn");
     TriangleTriangleIntersectionCross(p_c13, p_c32, true, "SrcInAngledOut");
 
@@ -906,9 +888,7 @@ TEST_F(TestTriangles, IntersectionTriangleTriangle3D_Cross) {
     TriangleTriangleIntersectionCross(p_e13, p_c33, true, "SrcEdgeAngledIn");
     TriangleTriangleIntersectionCross(p_c12, p_e33, false, "SrcEdgeAngledOut");
 
-    TriangleTriangleIntersectionCross(p_b145, p_b345, true,"SrcSidePerpendicular");
+    TriangleTriangleIntersectionCross(p_b145, p_b345, true, "SrcSidePerpendicular");
     TriangleTriangleIntersectionCross(p_b115, p_b32, true, "SrcSideAngledIn");
-    TriangleTriangleIntersectionCross(p_b14, p_b35,  true, "SrcSideAngledTouch");
-    
+    TriangleTriangleIntersectionCross(p_b14, p_b35, true, "SrcSideAngledTouch");
 }
-

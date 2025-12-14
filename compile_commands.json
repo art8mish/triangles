@@ -1,0 +1,44 @@
+[
+{
+  "directory": "/home/art8mish/kt_dz/c++/triangles/build",
+  "command": "/usr/bin/c++  -I/home/art8mish/kt_dz/c++/triangles/include -O3 -DNDEBUG -std=gnu++20 -Werror -Wall -Wextra -Wpedantic -Wcast-align -Wcast-qual -Wconversion -Wold-style-cast -Wredundant-decls -Wsign-conversion -Wsign-promo -o CMakeFiles/triangles.dir/src/triangles.cpp.o -c /home/art8mish/kt_dz/c++/triangles/src/triangles.cpp",
+  "file": "/home/art8mish/kt_dz/c++/triangles/src/triangles.cpp",
+  "output": "CMakeFiles/triangles.dir/src/triangles.cpp.o"
+},
+{
+  "directory": "/home/art8mish/kt_dz/c++/triangles/build/tests",
+  "command": "/usr/bin/c++  -I/home/art8mish/kt_dz/c++/triangles/include -O3 -DNDEBUG -std=gnu++20 -DGTEST_HAS_PTHREAD=1 -o CMakeFiles/line_tests.dir/line_tests.cpp.o -c /home/art8mish/kt_dz/c++/triangles/tests/line_tests.cpp",
+  "file": "/home/art8mish/kt_dz/c++/triangles/tests/line_tests.cpp",
+  "output": "tests/CMakeFiles/line_tests.dir/line_tests.cpp.o"
+},
+{
+  "directory": "/home/art8mish/kt_dz/c++/triangles/build/tests",
+  "command": "/usr/bin/c++  -I/home/art8mish/kt_dz/c++/triangles/include -O3 -DNDEBUG -std=gnu++20 -DGTEST_HAS_PTHREAD=1 -o CMakeFiles/point_tests.dir/point_tests.cpp.o -c /home/art8mish/kt_dz/c++/triangles/tests/point_tests.cpp",
+  "file": "/home/art8mish/kt_dz/c++/triangles/tests/point_tests.cpp",
+  "output": "tests/CMakeFiles/point_tests.dir/point_tests.cpp.o"
+},
+{
+  "directory": "/home/art8mish/kt_dz/c++/triangles/build/tests",
+  "command": "/usr/bin/c++  -I/home/art8mish/kt_dz/c++/triangles/include -O3 -DNDEBUG -std=gnu++20 -DGTEST_HAS_PTHREAD=1 -o CMakeFiles/vector_tests.dir/vector_tests.cpp.o -c /home/art8mish/kt_dz/c++/triangles/tests/vector_tests.cpp",
+  "file": "/home/art8mish/kt_dz/c++/triangles/tests/vector_tests.cpp",
+  "output": "tests/CMakeFiles/vector_tests.dir/vector_tests.cpp.o"
+},
+{
+  "directory": "/home/art8mish/kt_dz/c++/triangles/build/tests",
+  "command": "/usr/bin/c++  -I/home/art8mish/kt_dz/c++/triangles/include -O3 -DNDEBUG -std=gnu++20 -DGTEST_HAS_PTHREAD=1 -o CMakeFiles/plane_tests.dir/plane_tests.cpp.o -c /home/art8mish/kt_dz/c++/triangles/tests/plane_tests.cpp",
+  "file": "/home/art8mish/kt_dz/c++/triangles/tests/plane_tests.cpp",
+  "output": "tests/CMakeFiles/plane_tests.dir/plane_tests.cpp.o"
+},
+{
+  "directory": "/home/art8mish/kt_dz/c++/triangles/build/tests",
+  "command": "/usr/bin/c++  -I/home/art8mish/kt_dz/c++/triangles/include -O3 -DNDEBUG -std=gnu++20 -DGTEST_HAS_PTHREAD=1 -o CMakeFiles/triangles_tests.dir/triangles_tests.cpp.o -c /home/art8mish/kt_dz/c++/triangles/tests/triangles_tests.cpp",
+  "file": "/home/art8mish/kt_dz/c++/triangles/tests/triangles_tests.cpp",
+  "output": "tests/CMakeFiles/triangles_tests.dir/triangles_tests.cpp.o"
+},
+{
+  "directory": "/home/art8mish/kt_dz/c++/triangles/build/tests",
+  "command": "/usr/bin/c++  -I/home/art8mish/kt_dz/c++/triangles/include -O3 -DNDEBUG -std=gnu++20 -DGTEST_HAS_PTHREAD=1 -o CMakeFiles/octo_tree_tests.dir/octo_tree_tests.cpp.o -c /home/art8mish/kt_dz/c++/triangles/tests/octo_tree_tests.cpp",
+  "file": "/home/art8mish/kt_dz/c++/triangles/tests/octo_tree_tests.cpp",
+  "output": "tests/CMakeFiles/octo_tree_tests.dir/octo_tree_tests.cpp.o"
+}
+]

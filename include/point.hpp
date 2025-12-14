@@ -3,13 +3,13 @@
 #include <cmath>
 #include <concepts>
 #include <limits>
-#include <string>
 #include <stdexcept>
+#include <string>
 
 #include "utils.hpp"
 
 namespace triangles {
-template <std::floating_point T> class Point {
+template <std::floating_point T> class Point final {
     T eps_{epsilon<T>()};
 
 public:
@@ -17,13 +17,10 @@ public:
     T y;
     T z;
 
-    Point(T x, T y, T z) : x{x}, y{y}, z{z} {
-    }
-    Point(T x, T y) : Point(x, y, 0) {
-    }
-    
-    Point(T x) : Point(x, 0, 0) {
-    }
+    Point(T x, T y, T z) : x{x}, y{y}, z{z} {}
+    Point(T x, T y) : Point(x, y, 0) {}
+
+    Point(T x) : Point(x, 0, 0) {}
 
     Point() : Point(0, 0, 0) {}
 
@@ -52,8 +49,7 @@ public:
         validate();
         rhs.validate();
 
-        return equal<T>(x, rhs.x, eps_) && equal<T>(y, rhs.y, eps_) &&
-               equal<T>(z, rhs.z, eps_);
+        return equal<T>(x, rhs.x, eps_) && equal<T>(y, rhs.y, eps_) && equal<T>(z, rhs.z, eps_);
     }
 
     bool operator!=(const Point<T> &rhs) const {
@@ -63,26 +59,20 @@ public:
     // std::partial_ordering operator<=>(const Point<T>& rhs) const {
     //     if (!is_valid() || !rhs.is_valid())
     //         return std::partial_ordering::unordered;
-
-    //     if (equal<T>(x, rhs.x, eps_) && 
-    //         equal<T>(y, rhs.y, eps_) && 
+    //     if (equal<T>(x, rhs.x, eps_) &&
+    //         equal<T>(y, rhs.y, eps_) &&
     //         equal<T>(z, rhs.z, eps_)) {
     //         return std::partial_ordering::equivalent;
     //     }
-
-    //     if ((rhs.x - x > eps_) && (rhs.y - y > eps_) && (rhs.z - z > eps_))  return std::partial_ordering::less;
-    //     if (x - rhs.x > eps_) && return std::partial_ordering::greater;
-    //     if (rhs.y - y > eps_) && return std::partial_ordering::less;
-    //     if (y - rhs.y > eps_) && return std::partial_ordering::greater;
-    //     if (z + eps_ < rhs.z) && return std::partial_ordering::less;
-    //     if (rhs.z + eps_ < z) return std::partial_ordering::greater;
-        
+    //     if ((rhs.x - x > eps_) && (rhs.y - y > eps_) && (rhs.z - z > eps_))  return
+    //     std::partial_ordering::less; if (x - rhs.x > eps_) && return
+    //     std::partial_ordering::greater; if (rhs.y - y > eps_) && return
     //     return std::partial_ordering::unordered; // Точки "почти равны" но не совсем
     // }
 
     std::string to_string() const {
-        return "Point(" + std::to_string(x) + ", " + std::to_string(y) + ", " +
-               std::to_string(z) + ")";
+        return "Point(" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) +
+               ")";
     }
 };
 } // namespace triangles
