@@ -47,7 +47,6 @@ int main() {
         }
 
         coord_range = std::ceil(coord_range);
-        std::cout << "Coord range: " << coord_range << "\n";
         triangles::OctoTree<double> tree{coord_range};
         for (auto &triangle : triangles) {
             tree.add_triangle(std::move(triangle));

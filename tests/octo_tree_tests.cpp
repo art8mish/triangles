@@ -129,7 +129,6 @@ TEST_F(TestOctoTree, IntersectionDepth3) {
 TEST_F(TestOctoTree, IntersectionBorder) {
     OctoTree tree{p_min, p_max};
 
-    
     tree.add_triangle(tr_octI);
     tree.add_triangle(tr_octII);
     tree.add_triangle(tr_octIII);
@@ -156,18 +155,24 @@ TEST_F(TestOctoTree, IntersectionBorder) {
 }
 
 TEST_F(TestOctoTree, IntersectionBorder2) {
-    OctoTree tree{p_min, p_max};
 
-    Triangle t1{-3.584, 3.488, 0.3, 0.824, 2.268, 0.3, 0, -1.792, 0.3};
-    Triangle t2{-1.792, 1.744, 0.3, 0.412, 1.134, 0.3, 0, -0.896, 0.3};
+    OctoTree::Octant oct_contain {p_zero, Point {3, 3, 3}};
+    ASSERT_TRUE(oct_contain.contains(tr_octI));
 
-    tree.add_triangle(t1);
-    tree.add_triangle(t2);
+    OctoTree::Octant oct_contain_touch_out {p_zero, Point {2, 2, 2}};
+    ASSERT_TRUE(oct_contain_touch_out.contains(tr_octI));
 
-    const auto &intersections = tree.intersections();
+    OctoTree::Octant oct_contain_sec1 {p_zero, Point {1.5, 1.5, 1.5}};
+    ASSERT_TRUE(oct_contain_sec1.contains(tr_octI));
 
-    ASSERT_TRUE(intersections.contains(0));
-    ASSERT_TRUE(intersections.contains(1));
+    OctoTree::Octant oct_contain_sec2 {p_zero, Point {1.4, 1.4, 1.4}};
+    ASSERT_TRUE(oct_contain_sec2.contains(tr_octI));
+
+    OctoTree::Octant oct_not_contain {p_zero, Point {1, 1, 1}};
+    ASSERT_FALSE(oct_not_contain.contains(tr_octI));
+
+    OctoTree::Octant oct_contain_touch {Point {1, 0, 0}, p_octI_1};
+    ASSERT_TRUE(oct_contain_touch.contains(tr_octI));
 }
 
 

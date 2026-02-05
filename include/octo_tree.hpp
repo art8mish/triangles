@@ -6,6 +6,7 @@
 #include <iterator>
 #include <limits>
 #include <list>
+#include <algorithm>
 #include <optional>
 #include <set>
 #include <stdexcept>
@@ -16,7 +17,9 @@
 namespace triangles {
 template <std::floating_point T> class OctoTree final {
 
+public:
     struct Octant;
+
     std::list<Octant> nodes_{};
     using Node = typename std::list<Octant>::iterator;
     Node root_;
@@ -55,13 +58,13 @@ template <std::floating_point T> class OctoTree final {
         }
         Octant(const std::pair<Point<T>, Point<T>> &octant) : Octant(octant.first, octant.second) {}
         Octant(const Triangle<T> &tr) : Octant(Point<T>{
-            std::min(tr.p1().x, tr.p2().x, tr.p3().x),
-            std::min(tr.p1().y, tr.p2().y, tr.p3().y),
-            std::min(tr.p1().z, tr.p2().z, tr.p3().z)
+            std::min({tr.p1().x, tr.p2().x, tr.p3().x}),
+            std::min({tr.p1().y, tr.p2().y, tr.p3().y}),
+            std::min({tr.p1().z, tr.p2().z, tr.p3().z})
         }, Point<T>{
-            std::max(tr.p1().x, tr.p2().x, tr.p3().x),
-            std::max(tr.p1().y, tr.p2().y, tr.p3().y),
-            std::max(tr.p1().z, tr.p2().z, tr.p3().z)
+            std::max({tr.p1().x, tr.p2().x, tr.p3().x}),
+            std::max({tr.p1().y, tr.p2().y, tr.p3().y}),
+            std::max({tr.p1().z, tr.p2().z, tr.p3().z})
         }) {}
 
         const Childs &childs() const {
@@ -117,10 +120,23 @@ template <std::floating_point T> class OctoTree final {
             return Octant{Point<T>{min_.x, mid_.y, min_.z}, Point<T>{mid_.x, max_.y, mid_.z}};
         }
 
-        bool intersects_octant(const Octant<T> &other) const {
-            return Triangle<T>.segments_intersect(min_.x, max_.x, other.min_.x, other.max_.x) &&
-                Triangle<T>.segments_intersect(min_.y, max_.y, other.min_.y, other.max_.y) &&
-                Triangle<T>.segments_intersect(min_.y, max_.y, other.min_.y, other.max_.y)
+        bool intersects_octant(const Triangle<T> &tr) const {
+            
+            Point<T> aabb_min {
+                std::min({tr.p1().x, tr.p2().x, tr.p3().x}),
+                std::min({tr.p1().y, tr.p2().y, tr.p3().y}),
+                std::min({tr.p1().z, tr.p2().z, tr.p3().z})
+            };
+
+            Point<T> aabb_max {
+                std::max({tr.p1().x, tr.p2().x, tr.p3().x}),
+                std::max({tr.p1().y, tr.p2().y, tr.p3().y}),
+                std::max({tr.p1().z, tr.p2().z, tr.p3().z})
+            };
+
+            return Triangle<T>::segments_intersect(min_.x, max_.x, aabb_min.x, aabb_max.x) &&
+                Triangle<T>::segments_intersect(min_.y, max_.y, aabb_min.y, aabb_max.y) &&
+                Triangle<T>::segments_intersect(min_.z, max_.z, aabb_min.z, aabb_max.z);
         }
 
         bool contains(const Point<T> &p) const {
@@ -137,18 +153,19 @@ template <std::floating_point T> class OctoTree final {
             if (contains_triangle_point(tr))
                 return true;
 
-            const Octant<T> &aabb {tr};
-            if (intersects_octant(aabb))
-                return true;
+            if (!intersects_octant(tr))
+                return false;
 
             const Plane<T> tr_plane = tr.get_plane();
-            T dist = tr_plane.signed_distance(mid_);
+            T dist = std::abs(tr_plane.signed_distance(mid_));
+
             const Vector<T> &n = tr_plane.normal();
             Vector<T> abs_n{std::abs(n.x()), std::abs(n.y()), std::abs(n.z())};
+
             Vector<T> half_side {mid_, max_};
             T max_dist = abs_n.edot(half_side);
 
-            return max_dists - dist > -eps_;
+            return max_dist - dist > -eps_;
         }
 
         size_t size() const {
@@ -254,7 +271,6 @@ template <std::floating_point T> class OctoTree final {
             throw std::out_of_range("OctoTree can't insert triangle out of root bounds");
     }
 
-public:
     OctoTree(const Point<T> &min, const Point<T> &max) {
         nodes_.push_back(Octant{min, max});
         root_ = nodes_.begin();
