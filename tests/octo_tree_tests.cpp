@@ -125,3 +125,51 @@ TEST_F(TestOctoTree, IntersectionDepth3) {
         ASSERT_TRUE(intersections.contains(i));
     }
 }
+
+TEST_F(TestOctoTree, IntersectionBorder) {
+    OctoTree tree{p_min, p_max};
+
+    
+    tree.add_triangle(tr_octI);
+    tree.add_triangle(tr_octII);
+    tree.add_triangle(tr_octIII);
+    tree.add_triangle(tr_octIV);
+    tree.add_triangle(tr_octV);
+    tree.add_triangle(tr_octVI);
+    tree.add_triangle(tr_octVII);
+    tree.add_triangle(tr_octVIII);
+
+    Triangle tr_border_all_I_II{p_zero, p_octI_2, p_octII_3};
+    tree.add_triangle(tr_border_all_I_II);
+
+    Triangle tr_border_all_III_IV{p_zero, p_octIII_2, p_octIV_3};
+    tree.add_triangle(tr_border_all_III_IV);
+    const auto &intersections = tree.intersections();
+
+    ASSERT_EQ(intersections.size(), 6);
+    for (unsigned i = 0; i < 4; ++i) {
+        ASSERT_TRUE(intersections.contains(i));
+    }
+
+    ASSERT_TRUE(intersections.contains(8));
+    ASSERT_TRUE(intersections.contains(9));
+}
+
+TEST_F(TestOctoTree, IntersectionBorder2) {
+    OctoTree tree{p_min, p_max};
+
+    Triangle t1{-3.584, 3.488, 0.3, 0.824, 2.268, 0.3, 0, -1.792, 0.3};
+    Triangle t2{-1.792, 1.744, 0.3, 0.412, 1.134, 0.3, 0, -0.896, 0.3};
+
+    tree.add_triangle(t1);
+    tree.add_triangle(t2);
+
+    const auto &intersections = tree.intersections();
+
+    ASSERT_TRUE(intersections.contains(0));
+    ASSERT_TRUE(intersections.contains(1));
+}
+
+
+
+

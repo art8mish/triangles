@@ -49,15 +49,23 @@ template <std::floating_point T> class OctoTree final {
                             min_.z + (max_.z - min_.z) / 2};
         }
 
-        Octant() = delete;
         Octant(const Point<T> &min, const Point<T> &max) : min_{min}, max_{max} {
             validate();
             mid_ = mid();
         }
         Octant(const std::pair<Point<T>, Point<T>> &octant) : Octant(octant.first, octant.second) {}
+        Octant(const Triangle<T> &tr) : Octant(Point<T>{
+            std::min(tr.p1().x, tr.p2().x, tr.p3().x),
+            std::min(tr.p1().y, tr.p2().y, tr.p3().y),
+            std::min(tr.p1().z, tr.p2().z, tr.p3().z)
+        }, Point<T>{
+            std::max(tr.p1().x, tr.p2().x, tr.p3().x),
+            std::max(tr.p1().y, tr.p2().y, tr.p3().y),
+            std::max(tr.p1().z, tr.p2().z, tr.p3().z)
+        }) {}
 
         const Childs &childs() const {
-            return childs_.value();
+            return *childs_;
         }
 
         const Triangles &triangles() const {
@@ -109,14 +117,38 @@ template <std::floating_point T> class OctoTree final {
             return Octant{Point<T>{min_.x, mid_.y, min_.z}, Point<T>{mid_.x, max_.y, mid_.z}};
         }
 
+        bool intersects_octant(const Octant<T> &other) const {
+            return Triangle<T>.segments_intersect(min_.x, max_.x, other.min_.x, other.max_.x) &&
+                Triangle<T>.segments_intersect(min_.y, max_.y, other.min_.y, other.max_.y) &&
+                Triangle<T>.segments_intersect(min_.y, max_.y, other.min_.y, other.max_.y)
+        }
+
         bool contains(const Point<T> &p) const {
             return ((p.x > min_.x - eps_) && (p.x < max_.x + eps_)) &&
                    ((p.y > min_.y - eps_) && (p.y < max_.y + eps_)) &&
                    ((p.z > min_.z - eps_) && (p.z < max_.z + eps_));
         }
 
-        bool contains(const Triangle<T> &tr) const {
+        bool contains_triangle_point(const Triangle<T> &tr) const {
             return contains(tr.p1()) || contains(tr.p2()) || contains(tr.p3());
+        }
+
+        bool contains(const Triangle<T> &tr) const {
+            if (contains_triangle_point(tr))
+                return true;
+
+            const Octant<T> &aabb {tr};
+            if (intersects_octant(aabb))
+                return true;
+
+            const Plane<T> tr_plane = tr.get_plane();
+            T dist = tr_plane.signed_distance(mid_);
+            const Vector<T> &n = tr_plane.normal();
+            Vector<T> abs_n{std::abs(n.x()), std::abs(n.y()), std::abs(n.z())};
+            Vector<T> half_side {mid_, max_};
+            T max_dist = abs_n.edot(half_side);
+
+            return max_dists - dist > -eps_;
         }
 
         size_t size() const {
@@ -168,7 +200,8 @@ template <std::floating_point T> class OctoTree final {
         assert(!node->is_divided());
         std::array<Octant, Octant::CHILDS_NUM> child_octants{
             node->OctantI(), node->OctantII(), node->OctantIII(), node->OctantIV(),
-            node->OctantV(), node->OctantVI(), node->OctantVII(), node->OctantVIII()};
+            node->OctantV(), node->OctantVI(), node->OctantVII(), node->OctantVIII()
+        };
 
         typename Octant::Childs childs{};
         for (size_t i = 0; i < child_octants.size(); ++i) {

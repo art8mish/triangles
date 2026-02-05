@@ -13,7 +13,6 @@ current_time_ms() {
 
 # Initializing the binary path
 triag_bin=""
-
 while [[ $# -gt 0 ]]; do
     case "$1" in
         -b)
@@ -46,7 +45,7 @@ if [ -z "$triag_bin" ]; then
 fi
 
 if [ ! -f "$triag_bin" ]; then
-    echo "ERROR: 'triag' binary not found at: $triag_bin"
+    echo "ERROR: 'triangles' binary not found at: $triag_bin"
     rm -f "$temp_result"
     exit 1
 fi
@@ -54,9 +53,9 @@ fi
 temp_result="$script_dir/real_ans.ans"
 truncate -s 0 "$temp_result"
 
-for test_file in "$test_dir"/test*.txt; do
-    base_name=$(basename "$test_file" .txt)
-    answer_file="$answer_dir/${base_name/test/ans}.txt"
+for test_file in "$test_dir"/test*.dat; do
+    base_name=$(basename "$test_file" .dat)
+    answer_file="$answer_dir/${base_name/test/ans}.dat"
 
     [ ! -f "$answer_file" ] && { echo "Missing answer for $test_file"; rm -f "$temp_result"; exit 1; }
 
