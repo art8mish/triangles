@@ -22,7 +22,7 @@ template <std::floating_point T> class Triangle {
     Point<T> p1_{};
     Point<T> p2_{};
     Point<T> p3_{};
-    std::optional<Plane<T>> plane_ {};
+    std::optional<Plane<T>> plane_{};
     T eps_{epsilon<T>()};
 
 public:
@@ -33,6 +33,7 @@ public:
                  // line_ should be initialized
         POINT    // three points are equal
     };
+
 private:
     Kind kind_;
 
@@ -108,8 +109,6 @@ private:
         return std::pair<T, T>{std::min({proj1, proj2, proj3}), std::max({proj1, proj2, proj3})};
     }
 
-    
-
     bool projections_intersect_(const Triangle<T> &other, const Vector<T> &axis) const {
         const auto [this_a, this_b] = get_projection_segment_(axis);
         const auto [other_a, other_b] = other.get_projection_segment_(axis);
@@ -119,7 +118,7 @@ private:
     // rule: this and other should be in 2d and lie on same plane
     bool triangle_normal_proj_intersection_2d_(const Triangle<T> &other) const {
         const auto normals = get_2d_normals_();
-        
+
         for (auto &n : normals)
             if (!projections_intersect_(other, n))
                 return false;
@@ -409,7 +408,6 @@ private:
     }
 
 public:
-
     static bool segments_intersect(T segment1_a, T segment1_b, T segment2_a, T segment2_b) {
         const T max_a = std::max(segment1_a, segment2_a);
         const T min_b = std::min(segment1_b, segment2_b);

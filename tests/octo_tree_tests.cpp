@@ -156,25 +156,21 @@ TEST_F(TestOctoTree, IntersectionBorder) {
 
 TEST_F(TestOctoTree, IntersectionBorder2) {
 
-    OctoTree::Octant oct_contain {p_zero, Point {3, 3, 3}};
+    OctoTree::Octant oct_contain{p_zero, Point{3, 3, 3}};
     ASSERT_TRUE(oct_contain.contains(tr_octI));
 
-    OctoTree::Octant oct_contain_touch_out {p_zero, Point {2, 2, 2}};
+    OctoTree::Octant oct_contain_touch_out{p_zero, Point{2, 2, 2}};
     ASSERT_TRUE(oct_contain_touch_out.contains(tr_octI));
 
-    OctoTree::Octant oct_contain_sec1 {p_zero, Point {1.5, 1.5, 1.5}};
+    OctoTree::Octant oct_contain_sec1{p_zero, Point{1.5, 1.5, 1.5}};
     ASSERT_TRUE(oct_contain_sec1.contains(tr_octI));
 
-    OctoTree::Octant oct_contain_sec2 {p_zero, Point {1.4, 1.4, 1.4}};
+    OctoTree::Octant oct_contain_sec2{p_zero, Point{1.4, 1.4, 1.4}};
     ASSERT_TRUE(oct_contain_sec2.contains(tr_octI));
 
-    OctoTree::Octant oct_not_contain {p_zero, Point {1, 1, 1}};
+    OctoTree::Octant oct_not_contain{p_zero, Point{1, 1, 1}};
     ASSERT_FALSE(oct_not_contain.contains(tr_octI));
 
-    OctoTree::Octant oct_contain_touch {Point {1, 0, 0}, p_octI_1};
+    OctoTree::Octant oct_contain_touch{Point{1, 0, 0}, p_octI_1};
     ASSERT_TRUE(oct_contain_touch.contains(tr_octI));
 }
-
-
-
-

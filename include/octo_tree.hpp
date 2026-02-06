@@ -1,12 +1,12 @@
 
 
+#include <algorithm>
 #include <array>
 #include <cassert>
 #include <concepts>
 #include <iterator>
 #include <limits>
 #include <list>
-#include <algorithm>
 #include <optional>
 #include <set>
 #include <stdexcept>
@@ -57,15 +57,13 @@ public:
             mid_ = mid();
         }
         Octant(const std::pair<Point<T>, Point<T>> &octant) : Octant(octant.first, octant.second) {}
-        Octant(const Triangle<T> &tr) : Octant(Point<T>{
-            std::min({tr.p1().x, tr.p2().x, tr.p3().x}),
-            std::min({tr.p1().y, tr.p2().y, tr.p3().y}),
-            std::min({tr.p1().z, tr.p2().z, tr.p3().z})
-        }, Point<T>{
-            std::max({tr.p1().x, tr.p2().x, tr.p3().x}),
-            std::max({tr.p1().y, tr.p2().y, tr.p3().y}),
-            std::max({tr.p1().z, tr.p2().z, tr.p3().z})
-        }) {}
+        Octant(const Triangle<T> &tr)
+            : Octant(Point<T>{std::min({tr.p1().x, tr.p2().x, tr.p3().x}),
+                              std::min({tr.p1().y, tr.p2().y, tr.p3().y}),
+                              std::min({tr.p1().z, tr.p2().z, tr.p3().z})},
+                     Point<T>{std::max({tr.p1().x, tr.p2().x, tr.p3().x}),
+                              std::max({tr.p1().y, tr.p2().y, tr.p3().y}),
+                              std::max({tr.p1().z, tr.p2().z, tr.p3().z})}) {}
 
         const Childs &childs() const {
             return *childs_;
@@ -121,22 +119,18 @@ public:
         }
 
         bool intersects_octant(const Triangle<T> &tr) const {
-            
-            Point<T> aabb_min {
-                std::min({tr.p1().x, tr.p2().x, tr.p3().x}),
-                std::min({tr.p1().y, tr.p2().y, tr.p3().y}),
-                std::min({tr.p1().z, tr.p2().z, tr.p3().z})
-            };
 
-            Point<T> aabb_max {
-                std::max({tr.p1().x, tr.p2().x, tr.p3().x}),
-                std::max({tr.p1().y, tr.p2().y, tr.p3().y}),
-                std::max({tr.p1().z, tr.p2().z, tr.p3().z})
-            };
+            Point<T> aabb_min{std::min({tr.p1().x, tr.p2().x, tr.p3().x}),
+                              std::min({tr.p1().y, tr.p2().y, tr.p3().y}),
+                              std::min({tr.p1().z, tr.p2().z, tr.p3().z})};
+
+            Point<T> aabb_max{std::max({tr.p1().x, tr.p2().x, tr.p3().x}),
+                              std::max({tr.p1().y, tr.p2().y, tr.p3().y}),
+                              std::max({tr.p1().z, tr.p2().z, tr.p3().z})};
 
             return Triangle<T>::segments_intersect(min_.x, max_.x, aabb_min.x, aabb_max.x) &&
-                Triangle<T>::segments_intersect(min_.y, max_.y, aabb_min.y, aabb_max.y) &&
-                Triangle<T>::segments_intersect(min_.z, max_.z, aabb_min.z, aabb_max.z);
+                   Triangle<T>::segments_intersect(min_.y, max_.y, aabb_min.y, aabb_max.y) &&
+                   Triangle<T>::segments_intersect(min_.z, max_.z, aabb_min.z, aabb_max.z);
         }
 
         bool contains(const Point<T> &p) const {
@@ -162,7 +156,7 @@ public:
             const Vector<T> &n = tr_plane.normal();
             Vector<T> abs_n{std::abs(n.x()), std::abs(n.y()), std::abs(n.z())};
 
-            Vector<T> half_side {mid_, max_};
+            Vector<T> half_side{mid_, max_};
             T max_dist = abs_n.edot(half_side);
 
             return max_dist - dist > -eps_;
@@ -217,8 +211,7 @@ public:
         assert(!node->is_divided());
         std::array<Octant, Octant::CHILDS_NUM> child_octants{
             node->OctantI(), node->OctantII(), node->OctantIII(), node->OctantIV(),
-            node->OctantV(), node->OctantVI(), node->OctantVII(), node->OctantVIII()
-        };
+            node->OctantV(), node->OctantVI(), node->OctantVII(), node->OctantVIII()};
 
         typename Octant::Childs childs{};
         for (size_t i = 0; i < child_octants.size(); ++i) {
